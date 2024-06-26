@@ -7,7 +7,7 @@ class UserService(SQLModel, table=True):
     username: str
     email: str = Field(index=True, unique=True, nullable=False)
     cell_number: int
-    hash_password: str
+    hashed_password: str
     full_name: str
 
     

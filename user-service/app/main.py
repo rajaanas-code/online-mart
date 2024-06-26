@@ -29,7 +29,7 @@ async def consume_message(topic, bootstrap_servers):
         async for message in consumer:
             print(f"Received message on topic {message.topic}")
             user_data = json.loads(message.value.decode())
-            with next (get_session()) as session:
+            with next(get_session()) as session:
                 create_user(user_data=UserService(**user_data), session=session)
 
     finally:
@@ -59,13 +59,25 @@ async def create_new_user(user: UserService, session: Annotated[Session, Depends
     return create_user(user, session)
 
 @app.get("/users/", response_model=list[UserService])
-def read_users(session: Annotated[Session, Depends(get_session)]):
+def read_users(session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
     return get_all_user(session)
 
 @app.get("/users/{user_id}", response_model=UserService)
-def read_user(user_id: int, session: Annotated[Session, Depends(get_session)]):
+def read_user(user_id: int, session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
     return get_user_id(user_id, session)
 
 @app.delete("/users/{user_id}", response_model=UserService)
-def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)]):
+def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
     return delete_user_id(user_id, session)
+
+@app.post("/token")
+async def login_for_access_token(username: str, password: str, session: Session = Depends(get_session)):
+    user = authenticate_user(username, password, session)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate" : "Bearer"},
+        )
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}
