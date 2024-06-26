@@ -65,7 +65,7 @@ app = FastAPI(
 
 @app.get("/")
 def read_root():
-    return {"Hello": "PanaCloud"}
+    return {"Hello": "Product Service"}
 
 
 @app.post("/manage-products/", response_model=ProductService)
