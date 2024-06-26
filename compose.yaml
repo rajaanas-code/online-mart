@@ -1,6 +1,30 @@
 version: '3.8'
-name: online-mart
 services:
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./user-service:/code
+    depends_on:
+      - broker
+      - user_database
+    ports:
+      - "8008:8008"
+
+  user_database:
+    image: postgres:latest
+    restart: always
+    container_name: user_ser_cont
+    environment:
+      - POSTGRES_USER=rajaanas
+      - POSTGRES_PASSWORD=user123
+      - POSTGRES_DB=martdatabase
+    ports:
+      - '5436:5432'
+    volumes:
+      - user_database:/var/lib/postgresql/data
+
   product-service:
     build:
       context: ./product-service
@@ -12,19 +36,19 @@ services:
       - product_database
     ports:
       - "8007:8007"  
-      
+
   product_database:
     image: postgres:latest  
     restart: always 
     container_name: product_db_cont
     environment:
-        - POSTGRES_USER=ziakhan
-        - POSTGRES_PASSWORD=my_password
-        - POSTGRES_DB=mydatabase
+      - POSTGRES_USER=rajaanas
+      - POSTGRES_PASSWORD=pro_service
+      - POSTGRES_DB=martdatabase
     ports:
-        - '5437:5432'
+      - '5437:5432'
     volumes:
-        - product_database:/var/lib/postgresql/data
+      - product_database:/var/lib/postgresql/data
 
   broker:
     image: apache/kafka:3.7.0
@@ -61,9 +85,12 @@ services:
       - broker
 
 volumes:
+  user_database:
+    driver: local
   product_database:
     driver: local
 
 networks:
   default:
     driver: bridge
+    
