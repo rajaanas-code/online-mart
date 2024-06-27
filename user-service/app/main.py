@@ -8,6 +8,7 @@ import asyncio
 
 from app.user_db import engine
 from app.models.user_model import UserService
+from app.authentication.auth import get_current_user
 from app.crud.user_crud import authenticate_user, create_access_token, create_user, delete_user_id, get_all_user, get_user_id
 from app.dep import get_kafka_producer, get_session
 from app import settings

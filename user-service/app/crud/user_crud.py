@@ -1,9 +1,9 @@
-from fastapi import HTTPException, Security
+from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.models.user_model import UserService
 from datetime import datetime, timedelta
 from app.security import get_password_hash, verify_password
-from jose import JWTError, jwt
+from jose import jwt
 from app import settings
 
 
