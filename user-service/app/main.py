@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 from typing import Annotated, AsyncGenerator
 from sqlmodel import SQLModel, Session
 from contextlib import asynccontextmanager
@@ -8,7 +8,7 @@ import asyncio
 
 from app.user_db import engine
 from app.models.user_model import UserService
-from app.crud.user_crud import create_user, delete_user_id, get_all_user, get_user_id
+from app.crud.user_crud import authenticate_user, create_access_token, create_user, delete_user_id, get_all_user, get_user_id
 from app.dep import get_kafka_producer, get_session
 from app import settings
 

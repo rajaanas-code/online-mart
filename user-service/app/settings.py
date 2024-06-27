@@ -5,4 +5,4 @@ config = Config(".env")
 
 DATABASE_URL = config("DATABASE_URL", cast=Secret)
 KAFKA_USER_TOPIC = config("KAFKA_USER_TOPIC", cast=str)
-
+SECRET_KEY = config("SECRET_KEY", cast=Secret)
