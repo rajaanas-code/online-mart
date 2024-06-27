@@ -18,7 +18,7 @@ services:
     container_name: user_ser_cont
     environment:
       - POSTGRES_USER=rajaanas
-      - POSTGRES_PASSWORD=user123
+      - POSTGRES_PASSWORD=ai-system
       - POSTGRES_DB=martdatabase
     ports:
       - '5436:5432'
@@ -43,7 +43,7 @@ services:
     container_name: product_db_cont
     environment:
       - POSTGRES_USER=rajaanas
-      - POSTGRES_PASSWORD=pro_service
+      - POSTGRES_PASSWORD=ai-system
       - POSTGRES_DB=martdatabase
     ports:
       - '5437:5432'
