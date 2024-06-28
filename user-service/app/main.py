@@ -43,7 +43,7 @@ async def consume_message(topic, bootstrap_servers):
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     create_tables()
-    task = asyncio.create_task(consume_message(settings.kAFKA_USER_TOPIC, 'broker:19092'))
+    task = asyncio.create_task(consume_message(settings.KAFKA_USER_TOPIC, 'broker:19092'))
     yield
 
 app = FastAPI(
