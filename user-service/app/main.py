@@ -29,10 +29,14 @@ async def consume_message(topic, bootstrap_servers):
     try:
         async for message in consumer:
             print(f"Received message on topic {message.topic}")
-            user_data = json.loads(message.value.decode())
-            with next(get_session()) as session:
-                create_user(user_data=UserService(**user_data), session=session)
-
+            try:
+                user_data = json.loads(message.value.decode())
+                with next(get_session()) as session:
+                    create_user(user_data=UserService(**user_data), session=session)
+            except json.JSONDecodeError:
+                print("Failed to decode message, skipping...")
+            except Exception as e:
+                print(f"Error processing message: {e}")
     finally:
         await consumer.stop()
 

@@ -16,14 +16,12 @@ def create_user(user_data: UserService, session:Session):
     return user_data
 
 
-# Function to authenticate a user
 def authenticate_user(username: str, password: str, session: Session):
     user = session.exec(select(UserService).where(UserService.username == username)).first()
     if not user or not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     return user
 
-# Function to generate JWT token
 def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=15)):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
@@ -37,14 +35,14 @@ def get_all_user(session: Session):
 def get_user_id(user_id: int, session: Session):
     user = session.exec(select(UserService).where(UserService.id == user_id)).one_or_none()
     if user is None:
-        raise HTTPException(status_code=404, detail="User not found!")
+        raise HTTPException(status_code=404, detail=f"User id {user_id} not found!")
     return user
     
 def delete_user_id(user_id: int, session: Session):
     user = session.exec(select(UserService).where(UserService.id == user_id)).one_or_none()
     if user is None:
-        raise HTTPException(status_code=404, detail="User is not yet here try again")
+        raise HTTPException(status_code=404, detail=f"User id {user_id} does not exist, unable to delete.")
     session.delete(user)
     session.commit()
-    return {"message": "User id is deleted Successfully"}
+    return {"message": f"User id {user_id} deleted succesfully"}
        
