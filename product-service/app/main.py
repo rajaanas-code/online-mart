@@ -58,6 +58,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 # FastAPI app instance
 app = FastAPI(
     lifespan=lifespan,
+    description="AI Online Mart",
     title="Hello this is Product Service",
     version="0.0.1",
 )
@@ -70,7 +71,6 @@ def read_root():
 
 @app.post("/manage-products/", response_model=ProductService)
 async def create_new_product(product: ProductService, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
-
     product_dict = {field: getattr(product, field) for field in product.dict()}
     product_json = json.dumps(product_dict).encode("utf-8")
     print("product_JSON:", product_json)
@@ -85,7 +85,6 @@ def call_all_products(session: Annotated[Session, Depends(get_session)]):
 
 @app.get("/manage-products/{product_id}", response_model=ProductService)
 def get_single_product(product_id: int, session: Annotated[Session, Depends(get_session)]):
-
     try:
         return get_product_by_id(product_id=product_id, session=session)
     except HTTPException as e:
@@ -96,8 +95,6 @@ def get_single_product(product_id: int, session: Annotated[Session, Depends(get_
 
 @app.delete("/manage-products/{product_id}", response_model=ProductService)
 def delete_single_product(product_id: int, session: Annotated[Session, Depends(get_session)]):
-
-
     try:
         return delete_product_by_id(product_id=product_id, session=session)
     except HTTPException as e:

@@ -42,13 +42,16 @@ async def consume_message(topic, bootstrap_servers):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    print("Creating tables....")
+    task = asyncio.create_task(consume_message(
+        settings.KAFKA_USER_TOPIC, 'broker:19092'))
     create_tables()
-    task = asyncio.create_task(consume_message(settings.KAFKA_USER_TOPIC, 'broker:19092'))
     yield
 
 app = FastAPI(
     lifespan=lifespan,
-    title="User Service",
+    description="AI Online Mart",
+    title="Hello this is User Service",
     version="0.0.1",
 )
 
@@ -58,10 +61,12 @@ def read_root():
 
 @app.post("user/", response_model= UserService)
 async def create_new_user(user: UserService, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
-    user_dict = user.dict()
+    user_dict = {field: getattr(user, field) for field in user.dict()}
     user_json = json.dumps(user_dict).encode("utf-8")
+    print("user_JSON:", user_json)
     await producer.send_and_wait(settings.KAFKA_USER_TOPIC, user_json)
-    return create_user(user, session)
+    new_user =  create_user(user, session)
+    return new_user
 
 @app.get("/users/", response_model=list[UserService])
 def read_users(session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
