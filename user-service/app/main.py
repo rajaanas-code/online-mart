@@ -73,12 +73,22 @@ def read_users(session: Annotated[Session, Depends(get_session)], current_user: 
     return get_all_user(session)
 
 @app.get("/users/{user_id}", response_model=UserService)
-def read_user(user_id: int, session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
-    return get_user_id(user_id, session)
-
+def read_user_id(user_id: int, session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
+    try:
+        return get_user_id(user_id=user_id, session=session)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @app.delete("/users/{user_id}", response_model=UserService)
 def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
-    return delete_user_id(user_id, session)
+    try:
+        return delete_user_id(user_id=user_id, session=session)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/token")
 async def login_for_access_token(username: str, password: str, session: Session = Depends(get_session)):
