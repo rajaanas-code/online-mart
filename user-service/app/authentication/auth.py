@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 from app.models.user_model import UserService
 
 
-Oauth_schema = OAuth2PasswordBearer(tokenUrl="token")
+Oauth_schema = OAuth2PasswordBearer(tokenUrl="login-form")
 
 def get_current_user(token: str = Depends(Oauth_schema), session: Session = Depends(get_session)):
     credentials_exception = HTTPException(
@@ -20,8 +20,8 @@ def get_current_user(token: str = Depends(Oauth_schema), session: Session = Depe
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-    except JWTError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+    except JWTError:
+        raise HTTPException
     user = session.exec(select(UserService).where(UserService.username == username)).first()
     if user is None:
         raise credentials_exception

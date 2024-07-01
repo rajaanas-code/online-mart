@@ -90,7 +90,7 @@ def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)],
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/token")
+@app.post("/token-form")
 async def login_for_access_token(username: str, password: str, session: Session = Depends(get_session)):
     user = authenticate_user(username, password, session)
     if not user:
