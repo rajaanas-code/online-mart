@@ -9,10 +9,14 @@ from app import settings
 
 def create_user(user_data: UserService, session:Session):
     hashed_password = get_password_hash(user_data.password)
-    user_data.hashed_password = hashed_password
-    session.add(user_data)
+    user = UserService(
+        username=user_data.username,
+        email=user_data.email,
+        hashed_password=hashed_password
+    )
+    session.add(user)
     session.commit()
-    session.refresh(user_data)
+    session.refresh(user)
     return user_data
 
 

@@ -1,6 +1,12 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
 
+class UserCreate(SQLModel):
+    username: str
+    email: str
+    password: str
+
+    
 class UserService(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str

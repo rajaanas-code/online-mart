@@ -7,7 +7,7 @@ import json
 import asyncio
 
 from app.user_db import engine
-from app.models.user_model import UserService
+from app.models.user_model import UserCreate, UserService
 from app.authentication.auth import get_current_user
 from app.crud.user_crud import authenticate_user, create_access_token, create_user, delete_user_id, get_all_user, get_user_id
 from app.dep import get_kafka_producer, get_session
@@ -60,20 +60,20 @@ def read_root():
     return {"Hello": "User Service"}
 
 @app.post("/user/", response_model= UserService)
-async def create_new_user(user: UserService, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
-    user_dict = {field: getattr(user, field) for field in user.dict()}
+async def create_new_user(user: UserCreate, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
+    user_dict = user.dict()
     user_json = json.dumps(user_dict).encode("utf-8")
     print("user_JSON:", user_json)
     await producer.send_and_wait(settings.KAFKA_USER_TOPIC, user_json)
-    new_user =  create_user(user, session)
+    new_user =  UserCreate(user, session)
     return new_user
 
 @app.get("/users/", response_model=list[UserService])
-def read_users(session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
+def read_users(session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
     return get_all_user(session)
 
 @app.get("/users/{user_id}", response_model=UserService)
-def read_user_id(user_id: int, session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
+def read_user_id(user_id: int, session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
     try:
         return get_user_id(user_id=user_id, session=session)
     except HTTPException as e:
@@ -82,7 +82,7 @@ def read_user_id(user_id: int, session: Annotated[Session, Depends(get_session)]
         raise HTTPException(status_code=500, detail=str(e))
     
 @app.delete("/users/{user_id}", response_model=UserService)
-def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)], current_user: UserService = Depends(get_current_user)):
+def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
     try:
         return delete_user_id(user_id=user_id, session=session)
     except HTTPException as e:
