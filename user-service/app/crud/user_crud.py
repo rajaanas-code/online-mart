@@ -1,23 +1,23 @@
 from fastapi import HTTPException
 from sqlmodel import Session, select
-from app.models.user_model import UserService
+from app.models.user_model import UserCreate, UserService
 from datetime import datetime, timedelta
 from app.security import get_password_hash, verify_password
 from jose import jwt
 from app import settings
 
 
-def create_user(user_data: UserService, session:Session):
+def create_user(user_data: UserCreate, session:Session):
     hashed_password = get_password_hash(user_data.password)
-    user = UserService(
+    user_db = UserService(
         username=user_data.username,
         email=user_data.email,
         hashed_password=hashed_password
     )
-    session.add(user)
+    session.add(user_db)
     session.commit()
-    session.refresh(user)
-    return user_data
+    session.refresh(user_db)
+    return user_db
 
 
 def authenticate_user(username: str, password: str, session: Session):
