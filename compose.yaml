@@ -18,8 +18,8 @@ services:
     container_name: user_db_cont
     environment:
       - POSTGRES_USER=rajaanas
-      - POSTGRES_PASSWORD=project123
-      - POSTGRES_DB=userdatabase
+      - POSTGRES_PASSWORD=ai-online-mart
+      - POSTGRES_DB=martdatabase
     ports:
       - '5436:5432'
     volumes:
@@ -43,8 +43,8 @@ services:
     container_name: product_db_cont
     environment:
       - POSTGRES_USER=rajaanas
-      - POSTGRES_PASSWORD=product_password
-      - POSTGRES_DB=productdatabase
+      - POSTGRES_PASSWORD=ai-online-mart
+      - POSTGRES_DB=martdatabase
     ports:
       - '5437:5432'
     volumes:
