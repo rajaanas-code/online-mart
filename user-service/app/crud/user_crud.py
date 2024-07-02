@@ -9,15 +9,15 @@ from app import settings
 
 def create_user(user_data: UserCreate, session:Session):
     hashed_password = get_password_hash(user_data.password)
-    user_db = UserService(
+    new_user = UserService(
         username=user_data.username,
         email=user_data.email,
         hashed_password=hashed_password
     )
-    session.add(user_db)
+    session.add(new_user)
     session.commit()
-    session.refresh(user_db)
-    return user_db
+    session.refresh(new_user)
+    return new_user
 
 
 def authenticate_user(username: str, password: str, session: Session):

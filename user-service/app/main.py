@@ -1,3 +1,4 @@
+from datetime import timedelta
 from fastapi import FastAPI, Depends, HTTPException, status
 from typing import Annotated, AsyncGenerator
 from sqlmodel import SQLModel, Session
@@ -99,5 +100,6 @@ async def login_for_access_token(username: str, password: str, session: Session 
             detail="Incorrect username or password",
             headers={"WWW-Authenticate" : "Bearer"},
         )
-    access_token = create_access_token(data={"sub": user.username})
+    access_token_expires = timedelta(minutes=15)
+    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
     return {"access_token": access_token, "token_type": "bearer"}
