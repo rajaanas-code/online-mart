@@ -60,7 +60,7 @@ app = FastAPI(
 def read_root():
     return {"Hello": "User Service"}
 
-@app.post("/user/", response_model= UserService)
+@app.post("/user/", response_model=UserService)
 async def create_new_user(user: UserCreate, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
     user_dict = {field: getattr(user, field) for field in user.dict()}
     user_json = json.dumps(user_dict).encode("utf-8")
@@ -69,7 +69,7 @@ async def create_new_user(user: UserCreate, session: Annotated[Session, Depends(
     new_user = create_user(user, session)
     return new_user
 
-@app.get("/users/", response_model=list[UserService])
+@app.get("/users/", response_model=UserService)
 def read_users(session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
     return get_all_user(session)
 
