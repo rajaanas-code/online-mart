@@ -1,5 +1,30 @@
 version: '3.8'
 services:
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./inventory-service:/code
+    depends_on:
+      - broker
+      - inventory_database
+    ports:
+      - "8011:8011"
+
+  inventory_database:
+    image: postgres:latest
+    restart: always
+    container_name: inventory_db_cont
+    environment:
+      - POSTGRES_USER=rajaanas
+      - POSTGRES_PASSWORD=ai-online-mart
+      - POSTGRES_DB=martdatabase
+    ports:
+      - '5441:5432'
+    volumes:
+      - inventory_database:/var/lib/postgresql/data
+
   user-service:
     build:
       context: ./user-service

@@ -6,7 +6,7 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 import json
 import asyncio
 
-from app.db import engine
+from app.product_db import engine
 from app import settings
 from app.crud.crud_product import add_new_product, delete_product_by_id, get_all_products, get_product_by_id
 from app.dpdcy import get_kafka_producer, get_session
