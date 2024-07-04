@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   inventory-service:
     build:
@@ -113,6 +112,8 @@ volumes:
   user_database:
     driver: local
   product_database:
+    driver: local
+  inventory_database:
     driver: local
 
 networks:
