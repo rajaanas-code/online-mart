@@ -1,6 +1,7 @@
 from datetime import timedelta
 from fastapi import FastAPI, Depends, HTTPException, status
-from typing import Annotated, AsyncGenerator
+from typing import Annotated, AsyncGenerator, List
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import SQLModel, Session
 from contextlib import asynccontextmanager
 from aiokafka import AIOKafkaConsumer,AIOKafkaProducer
@@ -56,50 +57,72 @@ app = FastAPI(
     version="0.0.1",
 )
 
-@app.get("/")
-def read_root():
-    return {"Hello": "User Service"}
 
-@app.post("/user/", response_model=UserService)
-async def create_new_user(user: UserCreate, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
-    user_dict = {field: getattr(user, field) for field in user.dict()}
-    user_json = json.dumps(user_dict).encode("utf-8")
-    print("user_JSON:", user_json)
-    await producer.send_and_wait(settings.KAFKA_USER_TOPIC, user_json)
-    new_user = create_user(user, session)
-    return new_user
+# @app.post("/user/", response_model=UserService)
+# async def create_new_user(user: UserCreate, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
+#     user_dict = {field: getattr(user, field) for field in user.dict()}
+#     user_json = json.dumps(user_dict).encode("utf-8")
+#     print("user_JSON:", user_json)
+#     await producer.send_and_wait(settings.KAFKA_USER_TOPIC, user_json)
+#     new_user = create_user(user, session)
+#     return new_user
 
-@app.get("/users/", response_model=UserService)
+# @app.get("/users/", response_model=UserService)
+# def read_users(session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
+#     return get_all_user(session)
+
+# @app.get("/users/{user_id}", response_model=UserService)
+# def read_user_id(user_id: int, session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
+#     try:
+#         return get_user_id(user_id=user_id, session=session)
+#     except HTTPException as e:
+#         raise e
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+    
+# @app.delete("/users/{user_id}", response_model=UserService)
+# def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
+#     try:
+#         return delete_user_id(user_id=user_id, session=session)
+#     except HTTPException as e:
+#         raise e
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+
+# @app.post("/login-form")
+# async def login_for_access_token(username: str, password: str, session: Session = Depends(get_session)):
+#     user = authenticate_user(username, password, session)
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Incorrect username or password",
+#             headers={"WWW-Authenticate" : "Bearer"},
+#         )
+#     access_token_expires = timedelta(minutes=15)
+#     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
+#     return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/login-form")
+def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: Session = Depends(get_session)):
+    user = authenticate_user(username=form_data.username, password=form_data.password, session=session)
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/users/", response_model=List[UserService])
 def read_users(session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
     return get_all_user(session)
 
 @app.get("/users/{user_id}", response_model=UserService)
-def read_user_id(user_id: int, session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
-    try:
-        return get_user_id(user_id=user_id, session=session)
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-@app.delete("/users/{user_id}", response_model=UserService)
-def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
-    try:
-        return delete_user_id(user_id=user_id, session=session)
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def read_user(user_id: int, session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
+    return get_user_id(user_id=user_id, session=session)
 
-@app.post("/login-form")
-async def login_for_access_token(username: str, password: str, session: Session = Depends(get_session)):
-    user = authenticate_user(username, password, session)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate" : "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=15)
-    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
-    return {"access_token": access_token, "token_type": "bearer"}
+@app.delete("/users/{user_id}")
+def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)], _current_user: UserService = Depends(get_current_user)):
+    delete_user_id(user_id=user_id, session=session)
+    return {"message": f"User id {user_id} deleted successfully"}
+
+
+@app.get("/")
+def read_root():
+    return {"Hello": "User Service"}

@@ -21,7 +21,10 @@ def get_current_user(token: str = Depends(Oauth_schema), session: Session = Depe
         if username is None:
             raise credentials_exception
     except JWTError:
-        raise HTTPException
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
     user = session.exec(select(UserService).where(UserService.username == username)).first()
     if user is None:
         raise credentials_exception
