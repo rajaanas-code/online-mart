@@ -7,7 +7,7 @@ except FileNotFoundError:
     config = Config()
 
 DATABASE_URL = config("DATABASE_URL", cast=str)
-KAFKA_INVENTORY_TOPIC = config("kAFKA_INVENTORY_TOPIC", cast=str)
+KAFKA_INVENTORY_TOPIC = config("KAFKA_INVENTORY_TOPIC", cast=str)
 
 BOOTSTRAP_SERVER = config("BOOTSTRAP_SERVER", cast=str)
 
