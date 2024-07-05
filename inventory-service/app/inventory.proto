@@ -7,4 +7,3 @@ message inventory{
     float price = 4;
     int32 quantity = 5;
 }
-
