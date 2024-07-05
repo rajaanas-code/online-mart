@@ -63,7 +63,7 @@ def read_root():
 @app.post("/create-inventory/", response_model=InventoryItem)
 async def create_new_inventory_item(item: InventoryItem, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
     item_dict = {field: getattr(item, field) for field in item.dict()}
-    item_json = json.dumbs(item_dict).encode("utf-8")
+    item_json = json.dumps(item_dict).encode("utf-8")
     print("Item json:" ,item_json)
     await producer.send_and_wait(settings.KAFKA_INVENTORY_TOPIC, item_json)
     new_item = create_inventory_item(item, session)
