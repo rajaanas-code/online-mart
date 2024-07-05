@@ -59,14 +59,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     lifespan=lifespan,
     description="AI Online Mart",
-    title="Hello this is Product Service",
+    title="Welcome to Product Service",
     version="0.0.1",
 )
 
 
 @app.get("/")
 def read_root():
-    return {"Hello": "Product Service"}
+    return {"Hello": "This is Product Service"}
 
 
 @app.post("/manage-products/", response_model=ProductService)

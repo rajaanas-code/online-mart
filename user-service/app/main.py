@@ -52,13 +52,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     lifespan=lifespan,
     description="AI Online Mart",
-    title="Hello this is User Service",
+    title="Welcome to User Service",
     version="0.0.1",
 )
 
 @app.get("/")
 def read_root():
-    return {"Hello": "User Service"}
+    return {"Hello": "This is User Service"}
 
 @app.post("/user/", response_model=UserService)
 async def create_new_user(user: UserCreate, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):

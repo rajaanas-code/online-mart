@@ -11,14 +11,7 @@ from app.inventory_db import engine
 from app import settings
 from app.dependency import get_session, get_kafka_producer
 from app.models.inventory_model import InventoryItem
-from app.crud.inventory_crud import (
-    create_inventory_item, 
-    get_inventory_item, 
-    delete_inventory_item, 
-    get_all_inventory_item, 
-    update_inventory_item
-)
-
+from app.crud.inventory_crud import create_inventory_item, get_inventory_item, delete_inventory_item, get_all_inventory_item, update_inventory_item
 
 
 def create_db_table() -> None:
@@ -57,7 +50,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 app = FastAPI(
     lifespan=lifespan,
-    title="Hello this is Inventory Service",
+    title="Welcome to Inventory Service",
     description="AI Online Mart",
     version="0.0.1",
 )
@@ -65,7 +58,7 @@ app = FastAPI(
 
 @app.get("/")
 def read_root():
-    return {"Hello": "Inventory Service"}
+    return {"Hello": "This is Inventory Service"}
 
 @app.post("/create-inventory/", response_model=InventoryItem)
 async def create_new_inventory_item(item: InventoryItem, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
