@@ -2,43 +2,20 @@ from typing import Annotated, AsyncGenerator
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import SQLModel, Session
 from contextlib import asynccontextmanager
-from aiokafka import AIOKafkaProducer,AIOKafkaConsumer
-import json
+from aiokafka import AIOKafkaProducer
 import asyncio
-import json
 
+import json
 from app.inventory_db import engine
 from app import settings
-from app.dependency import get_session, get_kafka_producer
+from app.producer.produce import get_session, get_kafka_producer
 from app.models.inventory_model import InventoryItem
 from app.crud.inventory_crud import create_inventory_item, get_inventory_item, delete_inventory_item, get_all_inventory_item, update_inventory_item
-
+from app.consumer.consume import consume_messages
 
 def create_db_table() -> None:
     SQLModel.metadata.create_all(engine)
     
-
-async def consume_messages(topic, bootstrap_server):
-    consumer = AIOKafkaConsumer(
-        topic,
-        bootstrap_servers=bootstrap_server,
-        group_id="my-inventory",
-        auto_offset_reset='earliest'
-    )
-    await consumer.start()
-    try:
-        async for message in consumer:
-            print(f"Received message on topic {message.topic}")
-            inventory_data = json.loads(message.value.decode())
-            print(f"Inventory Data: {inventory_data}")
-            with next(get_session()) as session:
-                print("Saving data to database...")
-                db_insert_inventory = create_inventory_item(
-                    item=InventoryItem(**inventory_data), session=session)
-                print("DB_INSERT_INVENTORY:", db_insert_inventory)
-    finally:
-        await consumer.stop()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
@@ -101,4 +78,4 @@ def delete_single_inventory_item(item_id: int, session: Annotated[Session, Depen
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))                                    
+        raise HTTPException(status_code=500, detail=str(e))
