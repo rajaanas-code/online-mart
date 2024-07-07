@@ -9,3 +9,4 @@ KAFKA_USER_TOPIC = config("KAFKA_USER_TOPIC", cast=str)
 BOOTSTRAP_SERVER = config("BOOTSTRAP_SERVER", cast=str)
 
 SECRET_KEY = config("SECRET_KEY", cast=Secret)
+ALGORITHM = "HS256"

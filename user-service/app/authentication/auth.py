@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from app import settings
-from app.dep import get_session
+from app.user_producer import get_session
 from sqlmodel import Session, select
 from app.models.user_model import UserService
 

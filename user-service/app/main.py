@@ -11,7 +11,8 @@ from app.user_db import engine
 from app.models.user_model import UserCreate, UserService
 from app.authentication.auth import get_current_user
 from app.crud.user_crud import authenticate_user, create_access_token, create_user, delete_user_id, get_all_user, get_user_id
-from app.dep import get_kafka_producer, get_session
+from app.user_producer import get_kafka_producer, get_session
+from app.user_consumer import consume_messages
 from app import settings
 
 
@@ -19,32 +20,10 @@ def create_tables():
     SQLModel.metadata.create_all(engine)
 
 
-async def consume_message(topic, bootstrap_servers):
-    consumer = AIOKafkaConsumer(
-        topic,
-        bootstrap_servers=bootstrap_servers,
-        group_id="user-service",
-        auto_offset_reset='earliest'   
-    ) 
-    await consumer.start()
-    try:
-        async for message in consumer:
-            print(f"Received message on topic {message.topic}")
-            try:
-                user_data = json.loads(message.value.decode())
-                with next(get_session()) as session:
-                    create_user(user_data=UserService(**user_data), session=session)
-            except json.JSONDecodeError:
-                print("Failed to decode message, skipping...")
-            except Exception as e:
-                print(f"Error processing message: {e}")
-    finally:
-        await consumer.stop()
-
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("Creating tables....")
-    task = asyncio.create_task(consume_message(
+    task = asyncio.create_task(consume_messages(
         settings.KAFKA_USER_TOPIC, 'broker:19092'))
     create_tables()
     yield
