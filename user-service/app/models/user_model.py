@@ -12,5 +12,3 @@ class UserService(SQLModel, table=True):
     username: str
     email: str = Field(index=True, unique=True, nullable=False)
     hashed_password: str
-
-    
