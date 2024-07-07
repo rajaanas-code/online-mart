@@ -27,7 +27,7 @@ def update_product_item(product_id: int, product_data: ProductService, session: 
         session.commit()
         session.refresh(product)
         return product
-    raise HTTPException(status_code=404, detail=f"Item {item_id} is not found")
+    raise HTTPException(status_code=404, detail=f"Item {product_id} is not found")
 
 def delete_product_by_id(product_id: int, session: Session):
     product = session.exec(select(ProductService).where(ProductService.id == product_id)).one_or_none()

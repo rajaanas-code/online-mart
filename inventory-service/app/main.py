@@ -8,10 +8,10 @@ import asyncio
 import json
 from app.inventory_db import engine
 from app import settings
-from app.producer import get_session, get_kafka_producer
+from app.inventory_producer import get_session, get_kafka_producer
 from app.models.inventory_model import InventoryItem
 from app.crud.inventory_crud import create_inventory_item, get_inventory_item, delete_inventory_item, get_all_inventory_item, update_inventory_item
-from app.consumer import consume_messages
+from app.inventory_consumer import consume_messages
 
 def create_db_table() -> None:
     SQLModel.metadata.create_all(engine)

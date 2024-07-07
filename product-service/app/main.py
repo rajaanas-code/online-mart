@@ -9,9 +9,9 @@ import asyncio
 from app.product_db import engine
 from app import settings
 from app.crud.crud_product import add_new_product, delete_product_by_id, get_all_products, get_product_by_id, update_product_item
-from app.producer import get_kafka_producer, get_session
+from app.product_producer import get_kafka_producer, get_session
 from app.models.model_product import ProductService
-from app.consumer import consume_messages
+from app.product_consumer import consume_messages
 
 
 def create_db_and_tables() -> None:
@@ -47,6 +47,8 @@ async def create_new_product(product: ProductService, session: Annotated[Session
     product_dict = {field: getattr(product, field) for field in product.dict()}
     product_json = json.dumps(product_dict).encode("utf-8")
     print("product_JSON:", product_json)
+    try:
+        inventory_item = c
     await producer.send_and_wait(settings.KAFKA_PRODUCT_TOPIC, product_json)
     new_product = add_new_product(product, session)
     return new_product
