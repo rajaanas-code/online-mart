@@ -47,8 +47,6 @@ async def create_new_product(product: ProductService, session: Annotated[Session
     product_dict = {field: getattr(product, field) for field in product.dict()}
     product_json = json.dumps(product_dict).encode("utf-8")
     print("product_JSON:", product_json)
-    try:
-        inventory_item = c
     await producer.send_and_wait(settings.KAFKA_PRODUCT_TOPIC, product_json)
     new_product = add_new_product(product, session)
     return new_product
