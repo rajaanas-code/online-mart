@@ -18,10 +18,9 @@ async def consume_messages(topic, bootstrap_servers):
             print("RAW")
             print(f"Received message on topic {message.topic}")
 
-            product_data = json.loads(message.value.decode())
+            product_data = json.loads(message.value.decode('uft-8'))
             print("TYPE", (type(product_data)))
             print(f"Product Data", {product_data})
-
             with next(get_session()) as session:
                 print("SAVING DATA TO DATABASE")
                 db_insert_product = add_new_product(
