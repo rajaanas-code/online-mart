@@ -30,8 +30,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 app = FastAPI(
     lifespan=lifespan,
-    description="AI Online Mart",
     title="Welcome to User Service",
+    description="AI Online Mart",
     version="0.0.1",
 )
 
@@ -70,13 +70,13 @@ def delete_user(user_id: int, session: Annotated[Session, Depends(get_session)],
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/token")
+@app.post("/login")
 async def login_for_access_token(username: str, password: str, session: Session = Depends(get_session)):
     user = authenticate_user(username, password, session)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="your username or password is incorrect",
             headers={"WWW-Authenticate" : "Bearer"},
         )
     access_token_expires = timedelta(minutes=15)
