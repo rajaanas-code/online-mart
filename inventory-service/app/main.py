@@ -45,10 +45,18 @@ def read_root():
 @app.post("/create-inventory/", response_model=InventoryItem)
 async def create_new_inventory_item(item: InventoryItem, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
     """ Convert item to JSON  """
-    item_dict = {field: getattr(item, field) for field in item.dict()}
-    item_json = json.dumps(item_dict).encode("utf-8")
-    print("Sending item data to kafka:" ,item_json)
-    await producer.send_and_wait(settings.KAFKA_INVENTORY_TOPIC, item_json)
+    # item_dict = {field: getattr(item, field) for field in item.dict()}
+    # item_json = json.dumps(item_dict).encode("utf-8")
+    proto_item = InventoryItem(
+        id=item.id,
+        name=item.name,
+        description=item.description,
+        price=item.price,
+        quantity=item.quantity,
+    )
+    item_bytes = proto_item.SerializeToString()
+    print("Sending item data to kafka:" ,item_bytes)
+    await producer.send_and_wait(settings.KAFKA_INVENTORY_TOPIC, item_bytes)
     new_item = create_inventory_item(item, session)
     return new_item
 
@@ -71,13 +79,25 @@ def get_single_inventory_item(item_id: int, session: Annotated[Session, Depends(
 
 """ Endpoint to update an inventory item by ID """
 @app.put("/update-inventory/{item_id}", response_model=InventoryItem)
-def update_single_inventory_item(item_id: int, item_data: InventoryItem, session: Annotated[Session, Depends(get_session)]):
-    try:
-        return update_inventory_item(item_id=item_id, item_data=item_data, session=session)
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+async def update_single_inventory_item(item_id: int, item_data: InventoryItem, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
+    # try:
+    #     return update_inventory_item(item_id=item_id, item_data=item_data, session=session)
+    # except HTTPException as e:
+    #     raise e
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
+    proto_item = InventoryItem(
+        id=item_data.id,
+        name=item_data.name,
+        description=item_data.description,
+        price=item_data.price,
+        quantity=item_data.quantity
+    )
+    item_bytes = proto_item.SerializeToString()
+    print("Sending update item data to kafka:", item_bytes)
+    await producer.send_wait(settings.KAFKA_INVENTORY_TOPIC, item_bytes)
+    update_item = update_inventory_item(item_id=item_id, item_data=item_data, session=session)
+    return update_item
 
 """ Endpoint to delete an inventory item by ID """
 @app.delete("/delete-inventory/{item_id}", response_model=dict)
