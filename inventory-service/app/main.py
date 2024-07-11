@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from aiokafka import AIOKafkaProducer
 import asyncio
 
-import json
+# import json
 from app.inventory_db import engine
 from app import settings
 from app.inventory_producer import get_session, get_kafka_producer
