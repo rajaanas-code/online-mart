@@ -2,7 +2,8 @@ from aiokafka import AIOKafkaConsumer
 from app.models.inventory_model import InventoryItem
 from app.crud.inventory_crud import create_inventory_item
 from app.inventory_producer import get_session
-import json
+# import json
+import inventory_pb2
 
 async def consume_messages(topic, bootstrap_server):
     consumer = AIOKafkaConsumer(
@@ -15,9 +16,17 @@ async def consume_messages(topic, bootstrap_server):
     try:
         async for message in consumer:
             print(f"Received message on topic {message.topic}")
-
-            inventory_data = json.loads(message.value.decode('uft-8'))
-            print("TYPE", (type(inventory_data)))
+            # inventory_data = json.loads(message.value.decode('uft-8'))
+            # print("TYPE", (type(inventory_data)))
+            proto_item = inventory_pb2.InventoryItem()
+            proto_item.ParseFromString(message.value)
+            inventory_data = {
+                "id": proto_item.id,
+                "name": proto_item.name,
+                "description": proto_item.description,
+                "price": proto_item.price,
+                "quantity": proto_item.quantity,
+            }
             print(f"Inventory Data: {inventory_data}")
 
             with next(get_session()) as session:

@@ -13,6 +13,8 @@ from app.models.inventory_model import InventoryItem
 from app.crud.inventory_crud import create_inventory_item, get_inventory_item, delete_inventory_item, get_all_inventory_item, update_inventory_item
 from app.inventory_consumer import consume_messages
 
+
+""" Function to create the database table """
 def create_db_table() -> None:
     SQLModel.metadata.create_all(engine)
     
@@ -25,6 +27,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     create_db_table()
     yield
 
+
+""" Initialize FastAPI app """
 app = FastAPI(
     lifespan=lifespan,
     title="Welcome to Inventory Service",
@@ -32,25 +36,30 @@ app = FastAPI(
     version="0.0.1",
 )
             
-
+""" Root endpoint """
 @app.get("/")
 def read_root():
     return {"Hello": "This is Inventory Service"}
 
+""" Endpoint to create a new inventory item """
 @app.post("/create-inventory/", response_model=InventoryItem)
 async def create_new_inventory_item(item: InventoryItem, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
+    """ Convert item to JSON  """
     item_dict = {field: getattr(item, field) for field in item.dict()}
     item_json = json.dumps(item_dict).encode("utf-8")
-    print("Item json:" ,item_json)
+    print("Sending item data to kafka:" ,item_json)
     await producer.send_and_wait(settings.KAFKA_INVENTORY_TOPIC, item_json)
     new_item = create_inventory_item(item, session)
     return new_item
 
+
+""" Endpoint to get all inventory items """
 @app.get("/get-all-inventory/", response_model=list[InventoryItem])
 def call_all_inventory_items(session: Annotated[Session, Depends(get_session)]):
     return get_all_inventory_item(session)
 
 
+""" Endpoint to get a single inventory item by ID """
 @app.get("/get-inventory/{item_id}", response_model=InventoryItem)
 def get_single_inventory_item(item_id: int, session: Annotated[Session, Depends(get_session)]):
     try:
@@ -60,7 +69,7 @@ def get_single_inventory_item(item_id: int, session: Annotated[Session, Depends(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
+""" Endpoint to update an inventory item by ID """
 @app.put("/update-inventory/{item_id}", response_model=InventoryItem)
 def update_single_inventory_item(item_id: int, item_data: InventoryItem, session: Annotated[Session, Depends(get_session)]):
     try:
@@ -70,7 +79,7 @@ def update_single_inventory_item(item_id: int, item_data: InventoryItem, session
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
+""" Endpoint to delete an inventory item by ID """
 @app.delete("/delete-inventory/{item_id}", response_model=dict)
 def delete_single_inventory_item(item_id: int, session: Annotated[Session, Depends(get_session)]):
     try:
