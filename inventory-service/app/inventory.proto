@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-message inventory{
+message InventoryItem {
     int32 id = 1;
     string name = 2;
     string description = 3;

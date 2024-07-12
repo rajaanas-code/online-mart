@@ -3,7 +3,7 @@ from app.models.inventory_model import InventoryItem
 from app.crud.inventory_crud import create_inventory_item
 from app.inventory_producer import get_session
 # import json
-import inventory_pb2
+from app import inventory_pb2
 
 async def consume_messages(topic, bootstrap_server):
     consumer = AIOKafkaConsumer(

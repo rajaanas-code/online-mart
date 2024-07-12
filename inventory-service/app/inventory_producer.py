@@ -2,7 +2,7 @@ from aiokafka import AIOKafkaProducer
 from sqlmodel import Session
 from app.inventory_db import engine
 from app import settings
-import inventory_pb2
+from app import inventory_pb2
 
 async def get_kafka_producer():
     producer = AIOKafkaProducer(
