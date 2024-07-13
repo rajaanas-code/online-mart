@@ -53,7 +53,6 @@ async def create_new_product(product: ProductService, session: Annotated[Session
 
 @app.get("/get-product/all", response_model=list[ProductService])
 def call_all_products(session: Annotated[Session, Depends(get_session)]):
-
     return get_all_products(session)
 
 @app.get("/get-product/{product_id}", response_model=ProductService)

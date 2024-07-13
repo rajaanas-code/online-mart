@@ -6,6 +6,7 @@ from aiokafka import AIOKafkaProducer
 import asyncio
 
 # import json
+from app import inventory_pb2
 from app.inventory_db import engine
 from app import settings
 from app.inventory_producer import get_session, get_kafka_producer
@@ -47,7 +48,7 @@ async def create_new_inventory_item(item: InventoryItem, session: Annotated[Sess
     """ Convert item to JSON  """
     # item_dict = {field: getattr(item, field) for field in item.dict()}
     # item_json = json.dumps(item_dict).encode("utf-8")
-    proto_item = InventoryItem(
+    proto_item = inventory_pb2.InventoryItem(
         id=item.id,
         name=item.name,
         description=item.description,
@@ -86,16 +87,16 @@ async def update_single_inventory_item(item_id: int, item_data: InventoryItem, s
     #     raise e
     # except Exception as e:
     #     raise HTTPException(status_code=500, detail=str(e))
-    proto_item = InventoryItem(
+    proto_item = inventory_pb2.InventoryItem(
         id=item_data.id,
         name=item_data.name,
         description=item_data.description,
         price=item_data.price,
-        quantity=item_data.quantity
+        quantity=item_data.quantity,
     )
     item_bytes = proto_item.SerializeToString()
     print("Sending update item data to kafka:", item_bytes)
-    await producer.send_wait(settings.KAFKA_INVENTORY_TOPIC, item_bytes)
+    await producer.send_and_wait(settings.KAFKA_INVENTORY_TOPIC, item_bytes)
     update_item = update_inventory_item(item_id=item_id, item_data=item_data, session=session)
     return update_item
 

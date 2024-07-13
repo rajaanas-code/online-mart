@@ -18,17 +18,18 @@ async def consume_messages(topic, bootstrap_server):
             print(f"Received message on topic {message.topic}")
             # inventory_data = json.loads(message.value.decode('uft-8'))
             # print("TYPE", (type(inventory_data)))
+            # print(f"Inventory Data: {inventory_data}")
             proto_item = inventory_pb2.InventoryItem()
             proto_item.ParseFromString(message.value)
             inventory_data = {
                 "id": proto_item.id,
                 "name": proto_item.name,
                 "description": proto_item.description,
-                "price": proto_item.price,
                 "quantity": proto_item.quantity,
+                "price": proto_item.price
             }
             print(f"Inventory Data: {inventory_data}")
-
+            
             with next(get_session()) as session:
                 print("Saving data to database...")
                 db_insert_inventory = create_inventory_item(
