@@ -8,3 +8,4 @@ message Product {
     string brand = 5;
     float weight = 6;
 }
+

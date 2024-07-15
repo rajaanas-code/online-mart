@@ -1,9 +1,9 @@
-from datetime import timedelta
 from fastapi import FastAPI, Depends, HTTPException, status
+from datetime import timedelta
 from typing import Annotated, AsyncGenerator
 from sqlmodel import SQLModel, Session
 from contextlib import asynccontextmanager
-from aiokafka import AIOKafkaConsumer,AIOKafkaProducer
+from aiokafka import AIOKafkaProducer
 import json
 import asyncio
 
