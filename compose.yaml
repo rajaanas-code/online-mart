@@ -23,6 +23,31 @@ services:
       - '5441:5432'
     volumes:
       - inventory_database:/var/lib/postgresql/data
+  
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./order-service:/code
+    depends_on:
+      - broker
+      - order_database
+    ports:
+      - "8009:8011"
+  
+  order_database:
+    image: postgres:latest
+    restart: always
+    container_name: order_db_cont
+    environment:
+      - POSTGRES_USER=rajaanas
+      - POSTGRES_PASSWORD=ai-online-mart
+      - POSTGRES_DB=martdatabase
+    ports:
+      - '5439:5432'
+    volumes:
+      - order_database:/var/lib/postgresql/data
 
   user-service:
     build:
@@ -120,3 +145,5 @@ networks:
   default:
     driver: bridge
     
+
+
