@@ -140,6 +140,8 @@ volumes:
     driver: local
   inventory_database:
     driver: local
+  order_database:
+    driver: local
 
 networks:
   default:
