@@ -8,6 +8,7 @@ import json
 from app.order_db import engine
 from app.models.model import Order, OrderItem
 from app.crud import crud
+from app import settings
 from app.order_producer import get_kafka_producer
 from app.settings import KAFKA_ORDER_TOPIC
 from app.order_consumer import consume_messages
@@ -19,9 +20,11 @@ def create_db_and_tables():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    create_db_and_tables()
     print("Creating tables...")
-    task = asyncio.create_task(consume_messages())
+
+    task = asyncio.create_task(consume_messages(
+        settings.KAFKA_ORDER_TOPIC, 'broker:19092'))
+    create_db_and_tables()
     yield
 
 app = FastAPI(
@@ -30,6 +33,7 @@ app = FastAPI(
     title="Order Service",
     version="0.0.1",
 )
+
 
 
 @app.get("/")
