@@ -1,6 +1,7 @@
+from typing import List
 from sqlmodel import Session, select
 from fastapi import HTTPException
-from app.models.model import Order, OrderItem
+from app.models.order_model import Order, OrderItem
 
 def create_order(db: Session, order: Order) -> Order:
     db.add(order)
@@ -42,6 +43,6 @@ def add_order_item(db: Session, order_id: int, item: OrderItem) -> OrderItem:
     db.refresh(item)
     return item
 
-def get_order_item(db: Session, order_id: int) -> list[OrderItem]:
+def get_order_item(db: Session, order_id: int) -> List[OrderItem]:
     item = db.exec(select(OrderItem).where(OrderItem.order_id == order_id)).all()
     return item

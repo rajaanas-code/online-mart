@@ -8,9 +8,9 @@ import asyncio
 
 from app.product_db import engine
 from app import settings
-from app.crud.crud_product import add_new_product, delete_product_by_id, get_all_products, get_product_by_id, update_product_item
+from app.crud.product_crud import add_new_product, delete_product_by_id, get_all_products, get_product_by_id, update_product_item
 from app.product_producer import get_kafka_producer, get_session
-from app.models.model_product import ProductService
+from app.models.product_model import ProductService
 from app.product_consumer import consume_messages
 
 

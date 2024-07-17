@@ -1,3 +1,4 @@
+from typing import AsyncGenerator
 from aiokafka import AIOKafkaProducer
 from fastapi import FastAPI, Depends, HTTPException
 from sqlmodel import Session, SQLModel
@@ -6,7 +7,8 @@ import asyncio
 import json
 
 from app.order_db import engine
-from app.models.model import Order, OrderItem
+from app.order_producer import get_db
+from app.models.order_model import Order, OrderItem
 from app.crud import crud
 from app import settings
 from app.order_producer import get_kafka_producer
@@ -19,11 +21,9 @@ def create_db_and_tables():
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("Creating tables...")
-
-    task = asyncio.create_task(consume_messages(
-        settings.KAFKA_ORDER_TOPIC, 'broker:19092'))
+    task = asyncio.create_task(consume_messages())
     create_db_and_tables()
     yield
 
@@ -39,11 +39,6 @@ app = FastAPI(
 @app.get("/")
 def read_root():
     return {"Hello": "This is Order Service"}
-
-
-def get_db():
-    with Session(engine) as session:
-        yield session
 
 
 @app.post("/orders/", response_model=Order)

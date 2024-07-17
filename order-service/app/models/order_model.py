@@ -14,5 +14,5 @@ class OrderItem(SQLModel, table=True):
     product_id: int
     quantity: int
     price: float
-    order: "Order" = Relationship(back_populates="item")
+    order: "Order" = Relationship(back_populates="items")
 
