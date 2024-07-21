@@ -44,5 +44,5 @@ def add_order_item(db: Session, order_id: int, item: OrderItem) -> OrderItem:
     return item
 
 def get_order_item(db: Session, order_id: int) -> List[OrderItem]:
-    item = db.exec(select(OrderItem).where(OrderItem.order_id == order_id)).all()
-    return item
+    items = db.exec(select(OrderItem).where(OrderItem.order_id == order_id)).all()
+    return items
