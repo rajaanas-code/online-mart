@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 from fastapi import HTTPException
 from app.models.order_model import Order, OrderItem
 
-def create_order(db: Session, order: Order) -> Order:
+def db_create_order(db: Session, order: Order) -> Order:
     db.add(order)
     db.commit()
     db.refresh(order)
