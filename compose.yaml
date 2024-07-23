@@ -18,7 +18,7 @@ services:
     environment:
       - POSTGRES_USER=rajaanas
       - POSTGRES_PASSWORD=ai-online-mart
-      - POSTGRES_DB=martdatabase
+      - POSTGRES_DB=userdatabase
     ports:
       - '5436:5432'
     volumes:
@@ -43,7 +43,7 @@ services:
     environment:
       - POSTGRES_USER=rajaanas
       - POSTGRES_PASSWORD=ai-online-mart
-      - POSTGRES_DB=martdatabase
+      - POSTGRES_DB=productdatabase
     ports:
       - '5437:5432'
     volumes:
@@ -68,7 +68,7 @@ services:
     environment:
       - POSTGRES_USER=rajaanas
       - POSTGRES_PASSWORD=ai-online-mart
-      - POSTGRES_DB=martdatabase
+      - POSTGRES_DB=orderdatabase
     ports:
       - '5439:5432'
     volumes:
@@ -93,7 +93,7 @@ services:
     environment:
       - POSTGRES_USER=rajaanas
       - POSTGRES_PASSWORD=ai-online-mart
-      - POSTGRES_DB=martdatabase
+      - POSTGRES_DB=inventorydatabase
     ports:
       - '5441:5432'
     volumes:

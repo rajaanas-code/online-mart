@@ -31,8 +31,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 # FastAPI app instance
 app = FastAPI(
     lifespan=lifespan,
-    description="AI Online Mart",
     title="Welcome to Product Service",
+    description="AI Online Mart",
     version="0.0.1",
 )
 
