@@ -2,11 +2,11 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.models.product_model import ProductService
 
-def add_new_product(product_data: ProductService, Session: Session):
+def add_new_product(product_data: ProductService, session: Session):
     print("Adding product to Database")
-    Session.add(product_data)
-    Session.commit()
-    Session.refresh(product_data)
+    session.add(product_data)
+    session.commit()
+    session.refresh(product_data)
     return product_data
 
 def get_all_products(session: Session):
