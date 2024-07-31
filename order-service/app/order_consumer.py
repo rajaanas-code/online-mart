@@ -1,7 +1,7 @@
 from aiokafka import AIOKafkaConsumer
 from app.settings import BOOTSTRAP_SERVERS, KAFKA_ORDER_TOPIC
 from app.order_db import engine
-from app.models.order_model import Order
+from app.model.order_model import Order
 from app.crud.order_crud import create_order_item
 import json
 from sqlalchemy.orm import sessionmaker

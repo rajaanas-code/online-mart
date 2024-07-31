@@ -1,7 +1,7 @@
 from typing import List
 from sqlmodel import Session, select
 from fastapi import HTTPException
-from app.models.order_model import Order, OrderItem
+from app.model.order_model import Order, OrderItem
 
 def create_order_item(db: Session, order: Order) -> Order:
     db.add(order)

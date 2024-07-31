@@ -8,7 +8,7 @@ import json
 
 from app.order_db import engine
 from app.order_producer import get_db
-from app.models.order_model import Order, OrderItem
+from app.model.order_model import Order, OrderItem
 from app.crud.order_crud import create_order_item, get_order_item_from_db, update_order_in_db, delete_order_from_db, add_order_item_to_db, get_order_from_db
 from app.order_producer import get_kafka_producer
 from app.settings import KAFKA_ORDER_TOPIC

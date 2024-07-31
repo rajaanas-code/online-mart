@@ -1,6 +1,6 @@
 from fastapi import HTTPException 
 from sqlmodel import Session, select
-from app.models.inventory_model import InventoryItem
+from app.model.inventory_model import InventoryItem
 
 
 def create_inventory_item(item: InventoryItem, session:Session):
