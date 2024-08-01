@@ -17,7 +17,7 @@ services:
     container_name: user_db_cont
     environment:
       - POSTGRES_USER=rajaanas
-      - POSTGRES_PASSWORD=user_service
+      - POSTGRES_PASSWORD=user_12
       - POSTGRES_DB=userdatabase
     ports:
       - '5436:5432'
@@ -42,7 +42,7 @@ services:
     container_name: product_db_cont
     environment:
       - POSTGRES_USER=rajaanas
-      - POSTGRES_PASSWORD=product_service
+      - POSTGRES_PASSWORD=product_34
       - POSTGRES_DB=productdatabase
     ports:
       - '5437:5432'
@@ -67,7 +67,7 @@ services:
     container_name: order_db_cont
     environment:
       - POSTGRES_USER=rajaanas
-      - POSTGRES_PASSWORD=order_service
+      - POSTGRES_PASSWORD=order_56
       - POSTGRES_DB=orderdatabase
     ports:
       - '5439:5432'
@@ -92,7 +92,7 @@ services:
     container_name: inventory_db_cont
     environment:
       - POSTGRES_USER=rajaanas
-      - POSTGRES_PASSWORD=inventory_service
+      - POSTGRES_PASSWORD=inventory_78
       - POSTGRES_DB=inventorydatabase
     ports:
       - '5441:5432'
