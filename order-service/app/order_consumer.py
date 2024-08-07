@@ -12,13 +12,14 @@ async def consume_messages():
     consumer = AIOKafkaConsumer(
         KAFKA_ORDER_TOPIC,
         bootstrap_servers=BOOTSTRAP_SERVERS,
-        group_id="order-service",
+        group_id="my-order",
         auto_offset_reset='earliest'
     )
     await consumer.start()
     try:
         async for message in consumer:
             order_data = json.loads(message.value.decode('utf-8'))
+            print("TYPE", (type(order_data)))
             order = Order(**order_data)
             with SessionLocal() as session:
                 create_order_item(db=session, order=order)

@@ -17,9 +17,8 @@ async def consume_messages(topic, bootstrap_servers):
         async for message in consumer:
             print(f"Received message on topic {message.topic}")
             try:
-                user_data = json.loads(message.value.decode('uft-8'))
+                user_data = json.loads(message.value.decode('utf-8'))
                 print("TYPE", (type(user_data)))
-
                 with next(get_session()) as session:
                     create_user(user_data=UserService(**user_data), session=session)
             except json.JSONDecodeError:
