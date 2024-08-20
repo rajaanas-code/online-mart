@@ -18,6 +18,6 @@ RUN poetry config virtualenvs.create false
 
 RUN poetry install
 
-EXPOSE 8007
+EXPOSE 8010
 
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8007", "--reload"]
+CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8010", "--reload"]

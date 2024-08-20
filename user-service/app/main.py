@@ -19,7 +19,6 @@ from app import settings
 def create_tables():
     SQLModel.metadata.create_all(engine)
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("Creating tables....")

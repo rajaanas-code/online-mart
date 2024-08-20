@@ -7,3 +7,4 @@ class InventoryItem(SQLModel, table=True):
     description: Optional[str] = None
     price: float 
     quantity: int
+    
