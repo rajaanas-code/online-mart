@@ -49,6 +49,31 @@ services:
     volumes:
       - product_database:/var/lib/postgresql/data
 
+  payment-service:
+   build:
+     context: ./payment-service
+     dockerfile: Dockerfile.dev
+   volumes:
+    - ./payment-service:/code
+   depends_on:
+    - broker
+    - payment_database
+   ports:
+    - "8008:8008"
+
+  payment_database:
+    image: postgres:latest
+    restart: always
+    container_name: payment_db_cont
+    environment:
+    - POSTGRES_USER=rajaanas
+    - POSTGRES_PASSWORD=payment_50
+    - POSTGRES_DB=paymentdatabase
+    ports:
+    - '5438:5432'
+    volumes:
+    - payment_database:/var/lib/postgresql/data
+
   order-service:
     build:
       context: ./order-service
@@ -142,6 +167,8 @@ volumes:
   order_database:
     driver: local
   inventory_database:
+    driver: local
+  payment_database:
     driver: local
 
 networks:
