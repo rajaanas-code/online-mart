@@ -4,7 +4,6 @@ import asyncio
 
 
 app = FastAPI(
-    lifespan=lifespan,
     title="Welcome to Payment Service",
     description="AI Online Mart",
     version="0.0.1",
