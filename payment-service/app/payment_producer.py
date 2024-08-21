@@ -1,11 +1,10 @@
 from aiokafka import AIOKafkaProducer
+from typing import AsyncGenerator
 from sqlalchemy import create_engine
 from sqlmodel import Session
-from app.settings import settings
-import json
 
-# Initialize Kafka Producer
-async def get_kafka_producer() -> AIOKafkaProducer:
+async def get_kafka_producer() -> AsyncGenerator[AIOKafkaProducer, None]:
+    from app.settings import settings
     producer = AIOKafkaProducer(
         bootstrap_servers=settings.BOOTSTRAP_SERVER
     )
@@ -15,13 +14,8 @@ async def get_kafka_producer() -> AIOKafkaProducer:
     finally:
         await producer.stop()
 
-# Provide database session
-async def get_session() -> Session:
+async def get_session() -> AsyncGenerator[Session, None]:
+    from app.settings import settings 
     engine = create_engine(str(settings.DATABASE_URL).replace("postgresql", "postgresql+psycopg2"))
     async with Session(engine) as session:
         yield session
-
-async def send_payment_event(payment_event: dict):
-    async for producer in get_kafka_producer():
-        message = json.dumps(payment_event).encode('utf-8')
-        await producer.send_and_wait(settings.KAFKA_PAYMENT_TOPIC, message)
