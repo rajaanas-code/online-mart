@@ -120,7 +120,7 @@ services:
   #     - POSTGRES_PASSWORD=notification_56
   #     - POSTGRES_DB=notification_database
   #   ports:
-  #     - '5441:5432'
+  #     - '5440:5432'
   #   volumes:
   #     - notification_database:/var/lib/postgresql/data
 
