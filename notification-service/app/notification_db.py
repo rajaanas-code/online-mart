@@ -1,8 +1,11 @@
-from sqlmodel import create_engine, SQLModel
+from sqlmodel import create_engine
+from app import settings
 
-DATABASE_URL = "postgresql+psycopg2://user:password@db/notification_db"
 
-engine = create_engine(DATABASE_URL, echo=True)
+connection_string = str(settings.DATABASE_URL).replace(
+    "postgresql", "postgresql+psycopg"
+)
 
-def init_db():
-    SQLModel.metadata.create_all(engine)
+engine = create_engine(
+    connection_string, connect_args={}, pool_recycle=300
+)

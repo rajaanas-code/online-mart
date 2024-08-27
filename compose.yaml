@@ -118,7 +118,7 @@ services:
     environment:
       - POSTGRES_USER=rajaanas
       - POSTGRES_PASSWORD=notification_56
-      - POSTGRES_DB=notification_database
+      - POSTGRES_DB=notificationdatabase
     ports:
       - '5440:5432'
     volumes:
