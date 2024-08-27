@@ -1,14 +1,15 @@
 from aiokafka import AIOKafkaProducer
-import asyncio
-import json
-from app.settings import KAFKA_BROKER_URL, NOTIFICATION_TOPIC
+from sqlmodel import Session
+from app.notification_db import engine
 
-async def send_notification_event(notification_data: dict):
-    producer = AIOKafkaProducer(
-        bootstrap_servers=KAFKA_BROKER_URL,
-    )
+async def get_kafka_producer():
+    producer = AIOKafkaProducer(bootstrap_servers='broker:19092')
     await producer.start()
     try:
-        await producer.send_and_wait(NOTIFICATION_TOPIC, json.dumps(notification_data).encode('utf-8'))
+        yield producer
     finally:
         await producer.stop()
+
+def get_session():
+    with Session(engine) as session:
+        yield session
