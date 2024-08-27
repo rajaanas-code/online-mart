@@ -3,7 +3,7 @@ from app.notification_producer import get_session
 from app.crud.notification_crud import save_notification_to_db
 import json
 
-async def consume_messages(topic, group_id, bootstrap_servers):
+async def consume_messages(topic, bootstrap_servers):
     consumer = AIOKafkaConsumer(
         topic,
         bootstrap_servers=bootstrap_servers,
