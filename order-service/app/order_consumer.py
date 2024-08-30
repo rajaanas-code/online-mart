@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-async def consume_messages():
+async def consume_order_messages():
     consumer = AIOKafkaConsumer(
         KAFKA_ORDER_TOPIC,
         bootstrap_servers=BOOTSTRAP_SERVERS,

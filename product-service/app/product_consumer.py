@@ -5,7 +5,7 @@ from app.product_producer import get_session
 import json
 
 
-async def consume_messages(topic, bootstrap_servers):
+async def consume_product_messages(topic, bootstrap_servers):
     consumer = AIOKafkaConsumer(
         topic,
         bootstrap_servers=bootstrap_servers,

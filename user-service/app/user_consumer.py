@@ -5,7 +5,7 @@ from app.crud.user_crud import create_user
 import json
 
 
-async def consume_messages(topic, bootstrap_servers):
+async def consume_user_messages(topic, bootstrap_servers):
     consumer = AIOKafkaConsumer(
         topic,
         bootstrap_servers=bootstrap_servers,
