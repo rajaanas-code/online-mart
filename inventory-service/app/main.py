@@ -12,7 +12,7 @@ from app import settings
 from app.inventory_producer import get_session, get_kafka_producer
 from app.model.inventory_model import InventoryItem
 from app.crud.inventory_crud import create_inventory_item, get_inventory_item, delete_inventory_item, get_all_inventory_item, update_inventory_item
-from app.inventory_consumer import consume_messages
+from app.inventory_consumer import consume_inventory_messages
 
 
 """ Function to create the database table """
@@ -23,7 +23,7 @@ def create_db_table() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("creating table..")
-    task = asyncio.create_task(consume_messages(
+    task = asyncio.create_task(consume_inventory_messages(
         settings.KAFKA_INVENTORY_TOPIC, 'broker:19092'))
     create_db_table()
     yield

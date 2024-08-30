@@ -12,7 +12,7 @@ from app.model.user_model import UserCreate, UserService
 from app.authentication.auth import get_current_user
 from app.crud.user_crud import authenticate_user, create_access_token, create_user, delete_user_id, get_all_user, get_user_id
 from app.user_producer import get_kafka_producer, get_session
-from app.user_consumer import consume_messages
+from app.user_consumer import consume_user_messages
 from app import settings
 
 
@@ -22,7 +22,7 @@ def create_tables():
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("Creating tables....")
-    task = asyncio.create_task(consume_messages(
+    task = asyncio.create_task(consume_user_messages(
         settings.KAFKA_USER_TOPIC, 'broker:19092'))
     create_tables()
     yield

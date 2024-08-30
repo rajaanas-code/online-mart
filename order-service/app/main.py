@@ -12,7 +12,7 @@ from app.model.order_model import Order, OrderItem
 from app.crud.order_crud import create_order_item, get_order_item_from_db, update_order_in_db, delete_order_from_db, add_order_item_to_db, get_order_from_db
 from app.order_producer import get_kafka_producer
 from app.settings import KAFKA_ORDER_TOPIC
-from app.order_consumer import consume_messages
+from app.order_consumer import consume_order_messages
 
 
 def create_db_and_tables():
@@ -22,7 +22,7 @@ def create_db_and_tables():
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("Creating tables...")
-    task = asyncio.create_task(consume_messages())
+    task = asyncio.create_task(consume_order_messages())
     create_db_and_tables()
     yield
 
