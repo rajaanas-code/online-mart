@@ -6,6 +6,7 @@ from app.notification_db import engine
 from app.notification_consumer import consume_product_messages, consume_order_messages, consume_user_messages, consume_payment_messages
 import asyncio
 from app.notification_producer import get_session
+from app.crud.notification_crud import fetch_all_notifications
 
 def create_db_and_tables() -> None:
     SQLModel.metadata.create_all(engine)
@@ -39,4 +40,4 @@ def read_root():
 @app.get("/get_all_notifications/")
 def get_all_notifications():
     with next(get_session()) as session:
-        return get_all_notifications(session=session)
+        return fetch_all_notifications(session=session)
