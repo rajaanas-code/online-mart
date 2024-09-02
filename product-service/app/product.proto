@@ -5,7 +5,5 @@ message Product {
     string name = 2;
     string description = 3;
     float price  = 4;
-    string brand = 5;
-    float weight = 6;
+    int32 quantity = 5;
 }
-

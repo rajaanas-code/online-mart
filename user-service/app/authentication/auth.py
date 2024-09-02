@@ -6,13 +6,12 @@ from app.user_producer import get_session
 from sqlmodel import Session, select
 from app.model.user_model import UserService
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-Oauth_schema = OAuth2PasswordBearer(tokenUrl="/login")
-
-def get_current_user(token: str = Depends(Oauth_schema), session: Session = Depends(get_session)):
+def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credential",
+        detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -21,7 +20,7 @@ def get_current_user(token: str = Depends(Oauth_schema), session: Session = Depe
         if username is None:
             raise credentials_exception
     except JWTError:
-        raise HTTPException
+        raise credentials_exception
     user = session.exec(select(UserService).where(UserService.username == username)).first()
     if user is None:
         raise credentials_exception

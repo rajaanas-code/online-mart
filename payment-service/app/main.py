@@ -1,31 +1,34 @@
-from typing import AsyncGenerator
-from fastapi import FastAPI
-from sqlmodel import SQLModel
-from app.payment_consumer import consume_payment_messages
-from contextlib import asynccontextmanager
+from fastapi import FastAPI, Depends
+from sqlmodel import SQLModel, Session
+from app.crud.payment_crud import add_payment, get_payment_by_order
 from app.payment_db import engine
-from app import settings
-import asyncio
+from contextlib import asynccontextmanager
+from app.payment_producer import get_kafka_producer, get_session
+from app.model.payment_model import Payment
+import json
 
 def create_db_and_tables() -> None:
     SQLModel.metadata.create_all(engine)
 
-
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    task = asyncio.create_task(consume_payment_messages(
-        settings.KAFKA_PAYMENT_TOPIC, 'broker:19092'))
+async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
 
-app = FastAPI(
-    lifespan=lifespan,
-    title="Welcome to Payment Service",
-    description="AI Online Mart",
-    version="0.0.1",
-)
+app = FastAPI(lifespan=lifespan, title="Payment Service")
 
+@app.post("/payments/", response_model=Payment)
+async def create_new_payment(payment: Payment, session: Session = Depends(get_session)):
+    new_payment = add_payment(payment, session)
+    # Send notification to Kafka
+    producer = await get_kafka_producer()
+    notification_data = {
+        "type": "payment_processed",
+        "message": f"Payment of {new_payment.amount} for order ID {new_payment.order_id} processed successfully."
+    }
+    await producer.send_and_wait("notification-events", json.dumps(notification_data).encode("utf-8"))
+    return new_payment
 
-@app.get("/")
-async def root():
-    return {"message": "Payment Service"}
+@app.get("/payments/order/{order_id}", response_model=Payment)
+def read_payment(order_id: int, session: Session = Depends(get_session)):
+    return get_payment_by_order(order_id, session)

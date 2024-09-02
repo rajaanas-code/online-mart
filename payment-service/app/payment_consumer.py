@@ -3,11 +3,12 @@ from app.crud.payment_crud import add_payment
 from app.model.payment_model import Payment
 from app.payment_producer import get_session
 import json
+from app import settings
 
-async def consume_payment_messages(topic, bootstrap_servers):
+async def consume_payment_messages():
     consumer = AIOKafkaConsumer(
-        topic,
-        bootstrap_servers=bootstrap_servers,
+        settings.KAFKA_PAYMENT_TOPIC,
+        bootstrap_servers=settings.BOOTSTRAP_SERVER,
         group_id="payment-group",
         auto_offset_reset='earliest'
     )
