@@ -28,6 +28,7 @@ async def create_new_order(order: Order, session: Session = Depends(get_session)
         "message": f"Order for product ID {new_order.product_id} created successfully."
     }
     await producer.send_and_wait("notification-events", json.dumps(notification_data).encode("utf-8"))
+    await producer.stop()
     return new_order
 
 @app.get("/orders/{order_id}", response_model=Order)

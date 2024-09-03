@@ -19,6 +19,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, title="Notification Service")
 
-@app.get("/notifications/")
+@app.get("/get_all_notifications/")
 def get_all_notifications(session: Session = Depends(get_session)):
     return fetch_all_notifications(session=session)

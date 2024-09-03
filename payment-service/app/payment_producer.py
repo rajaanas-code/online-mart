@@ -6,11 +6,7 @@ from app.payment_db import engine
 async def get_kafka_producer():
     producer = AIOKafkaProducer(bootstrap_servers=settings.BOOTSTRAP_SERVER)
     await producer.start()
-    try:
-        yield producer
-    finally:
-        await producer.stop()
+    await producer.stop()
 
-def get_session():
-    with Session(engine) as session:
-        yield session
+def get_session() -> Session:
+    return Session(engine)

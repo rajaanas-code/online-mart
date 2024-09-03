@@ -2,7 +2,7 @@ from aiokafka import AIOKafkaConsumer
 from app.settings import BOOTSTRAP_SERVERS, KAFKA_ORDER_TOPIC
 from app.order_db import engine
 from app.model.order_model import Order
-from app.crud.order_crud import create_order_item
+from app.crud.order_crud import create_order
 import json
 from sqlalchemy.orm import sessionmaker
 
@@ -22,6 +22,6 @@ async def consume_order_messages():
             print("TYPE", (type(order_data)))
             order = Order(**order_data)
             with SessionLocal() as session:
-                create_order_item(db=session, order=order)
+                create_order(db=session, order=order)
     finally:
         await consumer.stop()

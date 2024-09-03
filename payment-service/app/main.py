@@ -27,6 +27,7 @@ async def create_new_payment(payment: Payment, session: Session = Depends(get_se
         "message": f"Payment of {new_payment.amount} for order ID {new_payment.order_id} processed successfully."
     }
     await producer.send_and_wait("notification-events", json.dumps(notification_data).encode("utf-8"))
+    await producer.stop()
     return new_payment
 
 @app.get("/payments/order/{order_id}", response_model=Payment)

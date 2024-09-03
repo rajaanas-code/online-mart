@@ -15,6 +15,7 @@ async def consume_notification_messages():
     try:
         async for message in consumer:
             notification_data = json.loads(message.value.decode('utf-8'))
+            print(f"Received message: {notification_data}")
             with next(get_session()) as session:
                 save_notification_to_db(notification_data=notification_data, session=session)
     finally:

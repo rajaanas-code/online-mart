@@ -17,7 +17,6 @@ async def consume_product_messages(topic, bootstrap_servers):
         async for message in consumer:
             print("RAW")
             print(f"Received message on topic {message.topic}")
-
             product_data = json.loads(message.value.decode('uft-8'))
             print("TYPE", (type(product_data)))
             print(f"Product Data", {product_data})
