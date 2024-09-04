@@ -7,7 +7,7 @@ from jose import jwt
 from app import settings
 
 def create_user(user_data: UserService, session: Session) -> UserService:
-    hashed_password = get_password_hash(user_data.password)
+    hashed_password = get_password_hash(user_data.hashed_password)
     new_user = UserService(
         username=user_data.username,
         email=user_data.email,
@@ -17,7 +17,6 @@ def create_user(user_data: UserService, session: Session) -> UserService:
     session.commit()
     session.refresh(new_user)
     return new_user
-
 
 def get_user_by_id(user_id: int, session: Session) -> UserService:
     user = session.exec(select(UserService).where(UserService.id == user_id)).first()

@@ -4,7 +4,6 @@ from app.crud.user_crud import create_user, get_user_by_id
 from app.model.user_model import UserService
 from app.user_db import engine
 from contextlib import asynccontextmanager
-import asyncio
 import json
 from app.user_producer import get_kafka_producer, get_session
 

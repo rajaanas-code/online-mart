@@ -6,7 +6,7 @@ from app import settings
 async def get_kafka_producer():
     producer = AIOKafkaProducer(bootstrap_servers=settings.BOOTSTRAP_SERVER)
     await producer.start()
-    return producer.stop() 
+    return producer 
 
 def get_session():
     with Session(engine) as session:
