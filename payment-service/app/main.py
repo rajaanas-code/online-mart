@@ -5,6 +5,7 @@ from app.payment_db import engine
 from contextlib import asynccontextmanager
 from app.payment_producer import get_kafka_producer, get_session
 from app.model.payment_model import Payment
+from app.utils.payment_email import send_email
 import json
 
 def create_db_and_tables() -> None:
@@ -20,6 +21,7 @@ app = FastAPI(lifespan=lifespan, title="Payment Service")
 @app.post("/payments/", response_model=Payment)
 async def create_new_payment(payment: Payment, session: Session = Depends(get_session)):
     new_payment = add_payment(payment, session)
+    
     # Send notification to Kafka
     producer = await get_kafka_producer()
     notification_data = {
@@ -27,6 +29,14 @@ async def create_new_payment(payment: Payment, session: Session = Depends(get_se
         "message": f"Payment of {new_payment.amount} for order ID {new_payment.order_id} processed successfully."
     }
     await producer.send_and_wait("notification-events", json.dumps(notification_data).encode("utf-8"))
+    
+    # Send email notification
+    send_email(
+        recipient="rajaanasturk157@gmail.com",  # Recipient email
+        subject="Payment Confirmation",
+        message=f"Your payment of ${new_payment.amount} for order ID {new_payment.order_id} has been completed successfully."
+    )
+    
     await producer.stop()
     return new_payment
 

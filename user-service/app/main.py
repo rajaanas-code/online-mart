@@ -6,6 +6,7 @@ from app.user_db import engine
 from contextlib import asynccontextmanager
 import json
 from app.user_producer import get_kafka_producer, get_session
+from app.utils.user_email import send_email
 
 def create_db_and_tables() -> None:
     SQLModel.metadata.create_all(engine)
@@ -20,6 +21,7 @@ app = FastAPI(lifespan=lifespan, title="User Service")
 @app.post("/users/", response_model=UserService)
 async def create_new_user(user: UserService, session: Session = Depends(get_session)):
     new_user = create_user(user, session)
+    
     # Send notification to Kafka
     producer = await get_kafka_producer()
     notification_data = {
@@ -27,6 +29,14 @@ async def create_new_user(user: UserService, session: Session = Depends(get_sess
         "message": f"User {new_user.username} created successfully."
     }
     await producer.send_and_wait("notification-events", json.dumps(notification_data).encode("utf-8"))
+    
+    # Send email notification
+    send_email(
+        recipient="rajaanasturk157@gmail.com",  # Recipient email
+        subject="User Registration",
+        message=f"Welcome {new_user.username}, your account has been created successfully."
+    )
+    
     return new_user
 
 @app.get("/users/{user_id}", response_model=UserService)
