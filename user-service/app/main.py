@@ -36,6 +36,7 @@ async def create_new_user(user: UserService, session: Session = Depends(get_sess
         subject="User Registration",
         message=f"Welcome {new_user.username}, your account has been created successfully."
     )
+    
     return new_user
 
 @app.get("/users/{user_id}", response_model=UserService)

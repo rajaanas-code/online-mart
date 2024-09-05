@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlmodel import SQLModel, Session
 from app.crud.order_crud import create_order, get_order_by_id
-from app.model.order_model import Order
+from app.model.order_model import OrderService
 from app.utils.order_email import send_email
 from app.order_db import engine
 from contextlib import asynccontextmanager
@@ -18,8 +18,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, title="Order Service")
 
-@app.post("/orders/", response_model=Order)
-async def create_new_order(order: Order, session: Session = Depends(get_session)):
+@app.post("/orders/", response_model=OrderService)
+async def create_new_order(order: OrderService, session: Session = Depends(get_session)):
     new_order = create_order(order, session)
     
     # Send notification to Kafka
@@ -40,6 +40,6 @@ async def create_new_order(order: Order, session: Session = Depends(get_session)
     await producer.stop()
     return new_order
 
-@app.get("/orders/{order_id}", response_model=Order)
+@app.get("/orders/{order_id}", response_model=OrderService)
 def read_order(order_id: int, session: Session = Depends(get_session)):
     return get_order_by_id(order_id, session)
