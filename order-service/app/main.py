@@ -43,3 +43,4 @@ async def create_new_order(order: OrderService, session: Session = Depends(get_s
 @app.get("/orders/{order_id}", response_model=OrderService)
 def read_order(order_id: int, session: Session = Depends(get_session)):
     return get_order_by_id(order_id, session)
+
