@@ -16,7 +16,12 @@ async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
 
-app = FastAPI(lifespan=lifespan, title="User Service")
+app = FastAPI(
+    lifespan=lifespan, 
+    title="Welcome to User Service",
+    description="Online Mart API",
+    version="0.0.1",
+)
 
 @app.post("/users/", response_model=UserService)
 async def create_new_user(user: UserService, session: Session = Depends(get_session)):

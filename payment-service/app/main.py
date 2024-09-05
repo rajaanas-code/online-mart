@@ -16,7 +16,12 @@ async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
 
-app = FastAPI(lifespan=lifespan, title="Payment Service")
+app = FastAPI(
+    lifespan=lifespan, 
+    title="Welcome to Payment Service",
+    description="Online Mart API",
+    version="0.0.1",
+)
 
 @app.post("/payments/", response_model=Payment)
 async def create_new_payment(payment: Payment, session: Session = Depends(get_session)):

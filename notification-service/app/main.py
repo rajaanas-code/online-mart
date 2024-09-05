@@ -17,8 +17,12 @@ async def lifespan(app: FastAPI):
     yield
     task.cancel()
 
-app = FastAPI(lifespan=lifespan, title="Notification Service")
-
+app = FastAPI(
+    lifespan=lifespan, 
+    title="Welcome to Notification Service",
+    description="Online Mart API",
+    version="0.0.1",
+)
 @app.get("/get_all_notifications/")
 def get_all_notifications(session: Session = Depends(get_session)):
     return fetch_all_notifications(session=session)

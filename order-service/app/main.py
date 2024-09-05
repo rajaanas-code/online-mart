@@ -16,7 +16,12 @@ async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
 
-app = FastAPI(lifespan=lifespan, title="Order Service")
+app = FastAPI(
+    lifespan=lifespan, 
+    title="Welcome to Order Service",
+    description="Online Mart API",
+    version="0.0.1",
+)
 
 @app.post("/orders/", response_model=OrderService)
 async def create_new_order(order: OrderService, session: Session = Depends(get_session)):
