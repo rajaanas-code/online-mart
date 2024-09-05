@@ -14,3 +14,6 @@ KAFKA_NOTIFICATION_TOPIC = config("KAFKA_NOTIFICATION_TOPIC", cast=str, default=
 
 SECRET_KEY = config("SECRET_KEY", cast=Secret)
 ALGORITHM = "HS256"
+
+MAILGUN_API_KEY = config("MAILGUN_API_KEY", cast=str)
+MAILGUN_DOMAIN = config("MAILGUN_DOMAIN", cast=str)

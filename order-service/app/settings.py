@@ -14,4 +14,9 @@ KAFKA_ORDER_TOPIC = config("KAFKA_ORDER_TOPIC", cast=str, default="order-events"
 KAFKA_USER_TOPIC = config("KAFKA_USER_TOPIC", cast=str, default="user-events")
 KAFKA_PAYMENT_TOPIC = config("KAFKA_PAYMENT_TOPIC", cast=str, default="payment-events")
 KAFKA_NOTIFICATION_TOPIC = config("KAFKA_NOTIFICATION_TOPIC", cast=str, default="notification-events")
+
+MAILGUN_API_KEY = config("MAILGUN_API_KEY", cast=str)
+MAILGUN_DOMAIN = config("MAILGUN_DOMAIN", cast=str)
+
+
 # KAFKA_CONSUMER_GROUP_ID_FOR_ORDER = config("KAFKA_CONSUMER_GROUP_ID_FOR_ORDER", cast=str)

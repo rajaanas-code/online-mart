@@ -6,7 +6,7 @@ from app.user_producer import get_session
 from sqlmodel import Session, select
 from app.model.user_model import UserService
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users")
 
 def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)):
     credentials_exception = HTTPException(
