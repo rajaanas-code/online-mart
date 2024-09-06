@@ -15,8 +15,8 @@ KAFKA_USER_TOPIC = config("KAFKA_USER_TOPIC", cast=str, default="user-events")
 KAFKA_PAYMENT_TOPIC = config("KAFKA_PAYMENT_TOPIC", cast=str, default="payment-events")
 KAFKA_NOTIFICATION_TOPIC = config("KAFKA_NOTIFICATION_TOPIC", cast=str, default="notification-events")
 
-MAILGUN_API_KEY = config("MAILGUN_API_KEY", cast=str)
-MAILGUN_DOMAIN = config("MAILGUN_DOMAIN", cast=str)
+MAILJET_API_KEY = config("MAILJET_API_KEY", cast=str)
+MAILJET_SECRET_KEY = config("MAILJET_SECRET_KEY", cast=Secret)
 
 
 # KAFKA_CONSUMER_GROUP_ID_FOR_ORDER = config("KAFKA_CONSUMER_GROUP_ID_FOR_ORDER", cast=str)

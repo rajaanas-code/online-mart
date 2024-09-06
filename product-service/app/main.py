@@ -22,6 +22,10 @@ app = FastAPI(
     version="0.0.1",
 )
 
+@app.get("/")
+def read_root():
+    return {"Hello": "This is Product Service"}
+
 @app.post("/products/", response_model=ProductService)
 async def create_product(product: ProductService, session: Session = Depends(get_session)):
     new_product = add_new_product(product, session)

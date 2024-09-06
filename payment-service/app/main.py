@@ -23,6 +23,10 @@ app = FastAPI(
     version="0.0.1",
 )
 
+@app.get("/")
+def read_root():
+    return {"Hello": "This is Payment Service"}
+
 @app.post("/payments/", response_model=Payment)
 async def create_new_payment(payment: Payment, session: Session = Depends(get_session)):
     new_payment = add_payment(payment, session)
@@ -42,7 +46,7 @@ async def create_new_payment(payment: Payment, session: Session = Depends(get_se
         message=f"Your payment of ${new_payment.amount} for order ID {new_payment.order_id} has been completed successfully."
     )
     
-    await producer.stop()
+    # await producer.stop()
     return new_payment
 
 @app.get("/payments/order/{order_id}", response_model=Payment)

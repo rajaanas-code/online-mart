@@ -23,6 +23,10 @@ app = FastAPI(
     version="0.0.1",
 )
 
+@app.get("/")
+def read_root():
+    return {"Hello": "This is User Service"}
+
 @app.post("/users/", response_model=UserService)
 async def create_new_user(user: UserService, session: Session = Depends(get_session)):
     new_user = create_user(user, session)
@@ -42,7 +46,7 @@ async def create_new_user(user: UserService, session: Session = Depends(get_sess
         message=f"Welcome {new_user.username}, your account has been created successfully."
     )
     
-    await producer.stop()
+    # await producer.stop()
     return new_user
 
 @app.get("/users/{user_id}", response_model=UserService)

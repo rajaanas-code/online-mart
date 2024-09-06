@@ -49,3 +49,6 @@ asyncio.create_task(consume_messages())
 ```
 
 https://github.com/aio-libs/aiokafka
+
+# 60d5f7a0db2a430a12360b98a5e400c0 mailjet secret key 
+# 7632464173402be35923ae991541f194 mailjet api key

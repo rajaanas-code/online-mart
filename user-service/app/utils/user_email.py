@@ -1,17 +1,28 @@
-import requests
-from fastapi import HTTPException
-from app.settings import MAILGUN_API_KEY, MAILGUN_DOMAIN
+import mailjet_rest
+from app.settings import MAILJET_API_KEY, MAILJET_SECRET_KEY
 
-MAILGUN_URL = f'https://api.mailgun.net/v3/{MAILGUN_DOMAIN}/messages'
-
-def send_email(recipient: str, subject: str, message: str):
-    response = requests.post(
-        MAILGUN_URL,
-        auth=("api", MAILGUN_API_KEY),
-        data={"from": f"User Service <mailgun@{MAILGUN_DOMAIN}>",
-              "to": recipient,
-              "subject": subject,
-              "text": message})
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=response.text)
+def send_email(recipient: str, subject: str, message: str) -> None:
+    mailjet = mailjet_rest.Client(auth=(MAILJET_API_KEY, MAILJET_SECRET_KEY), version='v3.1')
+    
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": "rajaanasturk157@gmail.com",  # Replace with your email
+                    "Name": "User Service"
+                },
+                "To": [
+                    {
+                        "Email": recipient,
+                        "Name": "User"
+                    }
+                ],
+                "Subject": subject,
+                "TextPart": message,
+            }
+        ]
+    }
+    
+    result = mailjet.send.create(data=data)
+    if result.status_code != 200:
+        raise Exception(f"Failed to send email: {result.status_code} {result.reason}")

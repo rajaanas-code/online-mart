@@ -23,6 +23,10 @@ app = FastAPI(
     version="0.0.1",
 )
 
+@app.get("/")
+def read_root():
+    return {"Hello": "This is Order Service"}
+
 @app.post("/orders/", response_model=OrderService)
 async def create_new_order(order: OrderService, session: Session = Depends(get_session)):
     new_order = create_order(order, session)

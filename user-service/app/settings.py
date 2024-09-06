@@ -12,8 +12,8 @@ KAFKA_ORDER_TOPIC = config("KAFKA_ORDER_TOPIC", cast=str, default="order-events"
 KAFKA_PAYMENT_TOPIC = config("KAFKA_PAYMENT_TOPIC", cast=str, default="payment-events")
 KAFKA_NOTIFICATION_TOPIC = config("KAFKA_NOTIFICATION_TOPIC", cast=str, default="notification-events")
 
+MAILJET_API_KEY = config("MAILJET_API_KEY", cast=str)
+MAILJET_SECRET_KEY = config("MAILJET_SECRET_KEY", cast=Secret)
+
 SECRET_KEY = config("SECRET_KEY", cast=Secret)
 ALGORITHM = "HS256"
-
-MAILGUN_API_KEY = config("MAILGUN_API_KEY", cast=str)
-MAILGUN_DOMAIN = config("MAILGUN_DOMAIN", cast=str)

@@ -23,6 +23,12 @@ app = FastAPI(
     description="Online Mart API",
     version="0.0.1",
 )
+
+@app.get("/")
+def read_root():
+    return {"Hello": "This is Notification Service"}
+
+
 @app.get("/get_all_notifications/")
 def get_all_notifications(session: Session = Depends(get_session)):
     return fetch_all_notifications(session=session)
