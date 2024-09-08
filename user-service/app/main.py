@@ -43,9 +43,7 @@ async def create_new_user(user: UserService, session: Session = Depends(get_sess
     send_email(
         recipient="rajaanasturk157@gmail.com", 
         subject="User Registration",
-        message=f"Welcome {new_user.username}, your account has been created successfully.",
-        image_url="https://ideogram.ai/assets/progressive-image/balanced/response/YD2jEiXhTdirFbqrAkq73Q"
-
+        message=f"Welcome {new_user.username}, your account has been created successfully."
     )
     
     # await producer.stop()

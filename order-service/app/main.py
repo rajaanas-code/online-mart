@@ -43,8 +43,7 @@ async def create_new_order(order: OrderService, session: Session = Depends(get_s
     send_email(
         recipient="rajaanasturk157@gmail.com",
         subject="Order Confirmation",
-        message=f"Your order for product ID {new_order.product_id} has been created successfully.",
-        image_url="https://ideogram.ai/assets/progressive-image/balanced/response/YD2jEiXhTdirFbqrAkq73Q"
+        message=f"Your order for product ID {new_order.product_id} has been created successfully."
 
     )
     
