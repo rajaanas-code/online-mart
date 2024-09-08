@@ -41,9 +41,10 @@ async def create_new_payment(payment: Payment, session: Session = Depends(get_se
     
     # Send email notification
     send_email(
-        recipient="rajaanasturk157@gmail.com",  # Recipient email
+        recipient="rajaanasturk157@gmail.com",
         subject="Payment Confirmation",
-        message=f"Your payment of ${new_payment.amount} for order ID {new_payment.order_id} has been completed successfully."
+        message=f"Your payment of ${new_payment.amount} for order ID {new_payment.order_id} has been completed successfully.",
+        image_url="https://ideogram.ai/assets/progressive-image/balanced/response/YD2jEiXhTdirFbqrAkq73Q"
     )
     
     # await producer.stop()

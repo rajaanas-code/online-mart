@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan, 
-    title="Welcome to User Service",
+    title="Welcome to Product Service",
     description="Online Mart API",
     version="0.0.1",
 )
