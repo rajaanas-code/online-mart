@@ -4,7 +4,7 @@ from app.crud.payment_crud import add_payment, get_payment_by_order
 from app.payment_db import engine
 from contextlib import asynccontextmanager
 from app.payment_producer import get_kafka_producer, get_session
-from app.model.payment_model import Payment
+from app.models.payment_model import PaymentService
 from app.utils.payment_email import send_email
 import json
 
@@ -27,8 +27,8 @@ app = FastAPI(
 def read_root():
     return {"Hello": "This is Payment Service"}
 
-@app.post("/payments/", response_model=Payment)
-async def create_new_payment(payment: Payment, session: Session = Depends(get_session)):
+@app.post("/payments/", response_model=PaymentService)
+async def create_new_payment(payment: PaymentService, session: Session = Depends(get_session)):
     new_payment = add_payment(payment, session)
     
     # Send notification to Kafka
@@ -49,6 +49,6 @@ async def create_new_payment(payment: Payment, session: Session = Depends(get_se
     # await producer.stop()
     return new_payment
 
-@app.get("/payments/order/{order_id}", response_model=Payment)
+@app.get("/payments/order/{order_id}", response_model=PaymentService)
 def read_payment(order_id: int, session: Session = Depends(get_session)):
     return get_payment_by_order(order_id, session)

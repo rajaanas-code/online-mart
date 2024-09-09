@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 from fastapi import HTTPException
-from app.model.order_model import OrderService
+from app.models.order_model import OrderService
 
 def create_order(order_data: OrderService, session: Session) -> OrderService:
     session.add(order_data)

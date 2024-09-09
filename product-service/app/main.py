@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlmodel import SQLModel, Session
 from app.crud.product_crud import add_new_product, get_all_products, get_product_by_id
 from app.product_producer import get_kafka_producer, get_session 
-from app.model.product_model import ProductService
+from app.models.product_model import ProductService
 from app.product_db import engine
 from contextlib import asynccontextmanager
 import json

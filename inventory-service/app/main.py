@@ -10,7 +10,7 @@ from app import inventory_pb2
 from app.inventory_db import engine
 from app import settings
 from app.inventory_producer import get_session, get_kafka_producer
-from app.model.inventory_model import InventoryItem
+from app.models.inventory_model import InventoryItem
 from app.crud.inventory_crud import create_inventory_item, get_inventory_item, delete_inventory_item, get_all_inventory_item, update_inventory_item
 from app.inventory_consumer import consume_inventory_messages
 

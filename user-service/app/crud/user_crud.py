@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 from fastapi import HTTPException
-from app.model.user_model import UserService
+from app.models.user_model import UserService
 from datetime import datetime, timedelta
 from app.security import get_password_hash, verify_password
 from jose import jwt

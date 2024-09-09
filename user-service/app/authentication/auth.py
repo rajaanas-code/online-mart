@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from app import settings
 from app.user_producer import get_session
 from sqlmodel import Session, select
-from app.model.user_model import UserService
+from app.models.user_model import UserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

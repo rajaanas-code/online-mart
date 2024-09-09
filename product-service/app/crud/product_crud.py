@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlmodel import Session, select
-from app.model.product_model import ProductService
+from app.models.product_model import ProductService
 
 def add_new_product(product_data: ProductService, session: Session) -> ProductService:
     session.add(product_data)

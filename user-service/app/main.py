@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlmodel import SQLModel, Session
 from app.crud.user_crud import create_user, get_user_by_id
-from app.model.user_model import UserService
+from app.models.user_model import UserService
 from app.user_db import engine
 from contextlib import asynccontextmanager
 import json

@@ -1,5 +1,5 @@
 from aiokafka import AIOKafkaConsumer
-from app.model.product_model import ProductService
+from app.models.product_model import ProductService
 from app.crud.product_crud import add_new_product
 from app.product_producer import get_session
 import json

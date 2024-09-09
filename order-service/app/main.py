@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlmodel import SQLModel, Session
 from app.crud.order_crud import create_order, get_order_by_id
-from app.model.order_model import OrderService
+from app.models.order_model import OrderService
 from app.utils.order_email import send_email
 from app.order_db import engine
 from contextlib import asynccontextmanager
