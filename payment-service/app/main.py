@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlmodel import SQLModel, Session
-from app.crud.payment_crud import add_payment, get_payment_by_order
+from app.crud.payment_crud import add_payment
 from app.payment_db import engine
 from contextlib import asynccontextmanager
 from app.payment_producer import get_kafka_producer, get_session
@@ -11,9 +11,9 @@ import json
 import stripe
 
 # Set your Stripe secret key (test mode)
-stripe.api_key = "sk_test_51Pwzr1Kt0JUMFNogQPOMEAKdavEHcDsLXIp7AzOCVIRqAZesf8BwlJDF1AjeH4Xtk8qWycHyCgAC9Loht4XJfpVj0064HFoaUp"
+stripe.api_key = STRIPE_API_KEY
 
-YOUR_DOMAIN = "http://localhost:8008"
+MY_DOMAIN = "http://localhost:8001"
 
 def create_db_and_tables() -> None:
     SQLModel.metadata.create_all(engine)
@@ -26,81 +26,74 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     lifespan=lifespan, 
     title="Payment Service with Stripe Integration",
-    description="Online Mart API - Payments",
+    description="Online Mart API",
     version="0.0.2",
 )
 
 @app.post("/create-stripe-payment/")
-async def create_stripe_payment(amount: int, session: Session = Depends(get_session)):
+async def create_stripe_payment(payment: PaymentService, session: Session = Depends(get_session)):
     """
-    This endpoint creates a Stripe Checkout session and returns the payment URL.
+    Creates a payment record and generates a Stripe checkout URL.
     """
     try:
-        # Create Stripe Checkout Session
+        # Step 1: Add the payment to the database
+        new_payment = add_payment(payment, session)
+
+        # Step 2: Create Stripe Checkout Session
         stripe_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
                 'price_data': {
                     'currency': 'usd',
-                    'product_data': {'name': 'Payment for Order'},
-                    'unit_amount': amount,  # Amount in cents
+                    'product_data': {'name': 'Order Payment'},
+                    'unit_amount': int(payment.amount * 100),  # Amount in cents
                 },
                 'quantity': 1,
             }],
             mode='payment',
-            success_url=f"http://localhost:8001/stripe-callback/payment-success?session_id={{CHECKOUT_SESSION_ID}}",
-            cancel_url=f"http://localhost:8002/payment-cancel",
+            success_url=f"{MY_DOMAIN}/stripe-callback/payment-success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{MY_DOMAIN}/payment-cancel",
         )
 
-        return {"url": stripe_session.url}
+        # Step 3: Return payment details and the Stripe checkout URL
+        return {
+            "payment_details": {
+                "id": new_payment.id,
+                "order_id": new_payment.order_id,
+                "amount": new_payment.amount,
+                "status": new_payment.status,
+                "payment_gateway": new_payment.payment_gateway
+            },
+            "checkout_url": stripe_session.url  # Return the Stripe checkout URL
+        }
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/payments/", response_model=PaymentService)
-async def create_new_payment(payment: PaymentService, session: Session = Depends(get_session)):
+@app.get("/stripe-callback/payment-success")
+async def payment_success(session_id: str):
     """
-    Creates a new payment record and triggers Kafka and email notifications.
+    This endpoint is called after successful payment.
     """
     try:
-        # Add payment to the database
-        new_payment = add_payment(payment, session)
-
-        # Send notification to Kafka
-        producer = await get_kafka_producer()
-        notification_data = {
-            "type": "payment_processed",
-            "message": f"Payment of {new_payment.amount} for order ID {new_payment.order_id} processed successfully."
-        }
-        await producer.send_and_wait("notification-events", json.dumps(notification_data).encode("utf-8"))
-        
-        # Send email notification
-        send_email(
-            recipient="rajaanasturk157@gmail.com",
-            subject="Payment Confirmation",
-            message=f"Your payment of ${new_payment.amount} for order ID {new_payment.order_id} has been completed successfully."
-        )
-
-        return new_payment
+        # Retrieve session details
+        session = stripe.checkout.Session.retrieve(session_id)
+        if session.payment_status == "paid":
+            return {
+                "message": "Payment succeeded",
+                "order_id": session.client_reference_id
+            }
+        else:
+            return {"message": "Payment not successful"}
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Payment processing failed: {str(e)}")
-
-
-@app.get("/stripe-callback/payment-success")
-async def payment_success(order_id: int):
-    return {
-        "message": "Payment succeeded",
-        "order_id": order_id
-    }
+        raise HTTPException(status_code=400, detail=f"Error processing payment: {str(e)}")
 
 
 @app.get("/payment-cancel")
 async def payment_cancel():
+    """
+    This endpoint is called if the user cancels the payment.
+    """
     return {"message": "Payment canceled by user."}
-
-
-@app.get("/payments/order/{order_id}", response_model=PaymentService)
-def read_payment(order_id: int, session: Session = Depends(get_session)):
-    return get_payment_by_order(order_id, session)
