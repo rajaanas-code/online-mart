@@ -1183,13 +1183,13 @@ full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7
 
 [[package]]
 name = "stripe"
-version = "10.10.0"
+version = "10.11.0"
 description = "Python bindings for the Stripe API"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "stripe-10.10.0-py2.py3-none-any.whl", hash = "sha256:36ab5f75e4af790dd6888450d812f502357b3e699a93cd2f1a8fd0014a4b4fca"},
-    {file = "stripe-10.10.0.tar.gz", hash = "sha256:82351f9e1055c2161dc38c08a9bbf5c4b6c7f1caffcf911e999a7012369415e2"},
+    {file = "stripe-10.11.0-py2.py3-none-any.whl", hash = "sha256:24300df559e547f58989e880c1f006460ed322d1c963d7b833562632b5eb956a"},
+    {file = "stripe-10.11.0.tar.gz", hash = "sha256:d18e1b498331fefd7738f7f72a8c0e852d7b933be9639604f81c8d575f44a1d7"},
 ]
 
 [package.dependencies]
@@ -1237,13 +1237,13 @@ files = [
 
 [[package]]
 name = "urllib3"
-version = "2.2.2"
+version = "2.2.3"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "urllib3-2.2.2-py3-none-any.whl", hash = "sha256:a448b2f64d686155468037e1ace9f2d2199776e17f0a46610480d311f73e3472"},
-    {file = "urllib3-2.2.2.tar.gz", hash = "sha256:dd505485549a7a552833da5e6063639d0d177c04f23bc3864e41e5dc5f612168"},
+    {file = "urllib3-2.2.3-py3-none-any.whl", hash = "sha256:ca899ca043dcb1bafa3e262d73aa25c465bfb49e0bd9dd5d59f1d0acba2f8fac"},
+    {file = "urllib3-2.2.3.tar.gz", hash = "sha256:e7d814a81dad81e6caf2ec9fdedb284ecc9c73076b62654547cc64ccdcae26e9"},
 ]
 
 [package.extras]
