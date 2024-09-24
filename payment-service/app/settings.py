@@ -16,5 +16,3 @@ MAILJET_API_KEY = config("MAILJET_API_KEY", cast=str)
 MAILJET_SECRET_KEY = config("MAILJET_SECRET_KEY", cast=Secret)
 
 STRIPE_API_KEY = str(config("STRIPE_API_KEY", cast=Secret))
-
-# KAFKA_PAYMENT_TOPIC = config("KAFKA_PAYMENT_TOPIC", cast=str)
