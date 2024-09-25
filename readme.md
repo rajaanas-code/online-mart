@@ -1,54 +1,26 @@
-# 02_kafka_messaging
+🛒 Online Mart API 🛒
+Welcome to the Online Mart API! 🛍️
 
-### AIOKafkaProducer
+This is a powerful and feature-rich API that provides a complete shopping experience. With the Online Mart API, you can integrate your mart services and offer your customers a seamless shopping experience. 🎯
 
-AIOKafkaProducer is a high-level, asynchronous message producer.
+Features:
 
-Example of AIOKafkaProducer usage:
+🛍️ Product Management: Easily add, update, or delete products. Manage your inventory efficiently with this API.
+🧾 Order Processing: A smooth order management system that allows you to create, update, and delete orders.
+👥 User Management: Authenticate and authorize your customers, and manage their details securely.
+💰 Payment Integration: A secure and reliable payment processing system that supports payment gateways like Stripe.
+🔔 Notification Service: Keep your users informed with real-time notifications about orders, payments, and updates.
+Tech Stack 🛠️:
 
-```
-from aiokafka import AIOKafkaProducer
+Python 🐍
+FastAPI ⚡
+Kafka 🐘
+Docker 🐳
+PostgreSQL 🐘
+Stripe 💳
+Get Started 🚀:
 
-# Kafka Producer as a dependency
-async def get_kafka_producer():
-    producer = AIOKafkaProducer(bootstrap_servers='broker:19092')
-    await producer.start()
-    try:
-        # Produce message
-        await producer.send_and_wait("my_topic", b"Super message")
-    finally:
-        await producer.stop()
-```
-
-### AIOKafkaConsumer
-AIOKafkaConsumer is a high-level, asynchronous message consumer. It interacts with the assigned Kafka Group Coordinator node to allow multiple consumers to load balance consumption of topics (requires kafka >= 0.9.0.0).
-
-Example of AIOKafkaConsumer usage:
-
-```
-from aiokafka import AIOKafkaConsumer
-import asyncio
-
-async def consume_messages():
-    consumer = AIOKafkaConsumer(
-        'my_topic', 'my_other_topic',
-        bootstrap_servers='localhost:9092',
-        group_id="my-group")
-    # Get cluster layout and join group `my-group`
-    await consumer.start()
-    try:
-        # Consume messages
-        async for msg in consumer:
-            print("consumed: ", msg.topic, msg.partition, msg.offset,
-                  msg.key, msg.value, msg.timestamp)
-    finally:
-        # Will leave consumer group; perform autocommit if enabled.
-        await consumer.stop()
-
-asyncio.create_task(consume_messages())
-```
-
-https://github.com/aio-libs/aiokafka
-
-# 60d5f7a0db2a430a12360b98a5e400c0 mailjet secret key 
-# 7632464173402be35923ae991541f194 mailjet api key
+Clone this repository
+Install dependencies
+Run the services using Docker Compose
+Note: Follow the documentation for detailed setup instructions.

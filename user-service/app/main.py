@@ -9,6 +9,7 @@ from app.user_producer import get_kafka_producer, get_session
 from app.utils.user_email import send_email
 from app import settings
 
+
 app = FastAPI()
 
 def create_db_and_tables() -> None:

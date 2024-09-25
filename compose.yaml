@@ -1,4 +1,5 @@
 services:
+###################     Microservices    ###################
   user-service:
     build:
       context: ./user-service
@@ -10,6 +11,68 @@ services:
       - user_database
     ports:
       - "8006:8006"
+
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./product-service:/code
+    depends_on:
+      - broker
+      - product_database
+    ports:
+      - "8007:8007"
+
+  payment-service:
+   build:
+     context: ./payment-service
+     dockerfile: Dockerfile.dev
+   volumes:
+    - ./payment-service:/code
+   depends_on:
+    - broker
+    - payment_database
+   ports:
+    - "8008:8008"
+
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./order-service:/code
+    depends_on:
+      - broker
+      - order_database
+    ports:
+      - "8009:8009"
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./notification-service:/code
+    depends_on:
+      - broker
+      - notification_database
+    ports:
+      - "8010:8010"
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./inventory-service:/code
+    depends_on:
+      - broker
+      - inventory_database
+    ports:
+      - "8011:8011"
+
+###################    Microservices Database    ###################
 
   user_database:
     image: postgres:latest
@@ -24,18 +87,6 @@ services:
     volumes:
       - user_database:/var/lib/postgresql/data
 
-  product-service:
-    build:
-      context: ./product-service
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./product-service:/code
-    depends_on:
-      - broker
-      - product_database
-    ports:
-      - "8007:8007"  
-
   product_database:
     image: postgres:latest  
     restart: always 
@@ -49,18 +100,6 @@ services:
     volumes:
       - product_database:/var/lib/postgresql/data
 
-  payment-service:
-   build:
-     context: ./payment-service
-     dockerfile: Dockerfile.dev
-   volumes:
-    - ./payment-service:/code
-   depends_on:
-    - broker
-    - payment_database
-   ports:
-    - "8008:8008"
-
   payment_database:
     image: postgres:latest
     restart: always
@@ -73,18 +112,6 @@ services:
     - '5438:5432'
     volumes:
     - payment_database:/var/lib/postgresql/data
-
-  order-service:
-    build:
-      context: ./order-service
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./order-service:/code
-    depends_on:
-      - broker
-      - order_database
-    ports:
-      - "8009:8009"
   
   order_database:
     image: postgres:latest
@@ -99,18 +126,6 @@ services:
     volumes:
       - order_database:/var/lib/postgresql/data
 
-  notification-service:
-    build:
-      context: ./notification-service
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./notification-service:/code
-    depends_on:
-      - broker
-      - notification_database
-    ports:
-      - "8010:8010"
-  
   notification_database:
     image: postgres:latest
     restart: always
@@ -123,18 +138,6 @@ services:
       - '5440:5432'
     volumes:
       - notification_database:/var/lib/postgresql/data
-
-  inventory-service:
-    build:
-      context: ./inventory-service
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./inventory-service:/code
-    depends_on:
-      - broker
-      - inventory_database
-    ports:
-      - "8011:8011"
 
   inventory_database:
     image: postgres:latest
@@ -149,6 +152,7 @@ services:
     volumes:
       - inventory_database:/var/lib/postgresql/data
   
+###################  Kakfa Broker & UI  ###################
 
   broker:
     image: apache/kafka:3.7.0
@@ -183,6 +187,8 @@ services:
       DYNAMIC_CONFIG_ENABLED: "true"
     depends_on:
       - broker
+
+################### Volumes & Network ##################
 
 volumes:
   user_database:
