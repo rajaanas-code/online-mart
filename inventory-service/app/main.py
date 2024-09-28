@@ -1,110 +1,94 @@
-from typing import Annotated, AsyncGenerator
-from fastapi import Depends, FastAPI, HTTPException
-from sqlmodel import SQLModel, Session
+from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
+from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
-from aiokafka import AIOKafkaProducer
+from sqlmodel import Session, SQLModel
+from typing import AsyncGenerator
+from typing import Annotated
 import asyncio
+import json
 
-# import json
-from app import inventory_pb2
-from app.inventory_db import engine
 from app import settings
+from app.inventory_db import engine
+from app.consumer.add_inventory_consumer import consume_messages
 from app.inventory_producer import get_session, get_kafka_producer
-from app.models.inventory_model import InventoryItem
-from app.crud.inventory_crud import create_inventory_item, get_inventory_item, delete_inventory_item, get_all_inventory_item, update_inventory_item
-from app.inventory_consumer import consume_inventory_messages
+from app.consumer.check_stock_consumer import consume_order_messages
+from app.models.inventory_model import InventoryItem,InventoryItemUpdate
+from app.consumer.update_stock_consumer import consume_order_paid_messages
+from app.auth import get_current_user,admin_required,LoginForAccessTokenDep
+from app.crud.inventory_crud import delete_inventory_item_by_id, get_all_inventory_items, get_inventory_item_by_id,update_inventory_by_id
 
-
-""" Function to create the database table """
-def create_db_table() -> None:
+def create_db_and_tables() -> None:
     SQLModel.metadata.create_all(engine)
-    
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    print("creating table..")
-    task = asyncio.create_task(consume_inventory_messages(
-        settings.KAFKA_INVENTORY_TOPIC, 'broker:19092'))
-    create_db_table()
+    print("Creating table..")
+    task = asyncio.create_task(consume_messages("product-events",settings.BOOTSTRAP_SERVER))
+    
+    asyncio.create_task(consume_order_messages(
+    "order_placed",
+    settings.BOOTSTRAP_SERVER
+    ))
+
+    asyncio.create_task(consume_order_paid_messages(
+    "order_paid",
+    settings.BOOTSTRAP_SERVER
+    ))
+
+    print("refresh")
+    create_db_and_tables()
     yield
 
 
-""" Initialize FastAPI app """
 app = FastAPI(
     lifespan=lifespan,
     title="Welcome to Inventory Service",
-    description="AI Online Mart",
+    description="Online Mart API",
     version="0.0.1",
 )
-            
-""" Root endpoint """
+
+
 @app.get("/")
 def read_root():
-    return {"Hello": "This is Inventory Service"}
+    return {"message": "This is Inventory Service"}
 
-""" Endpoint to create a new inventory item """
-@app.post("/create-inventory/", response_model=InventoryItem)
-async def create_new_inventory_item(item: InventoryItem, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
-    """ Convert item to JSON  """
-    # item_dict = {field: getattr(item, field) for field in item.dict()}
-    # item_json = json.dumps(item_dict).encode("utf-8")
-    proto_item = inventory_pb2.InventoryItem(
-        id=item.id,
-        name=item.name,
-        description=item.description,
-        price=item.price,
-        quantity=item.quantity,
-    )
-    item_bytes = proto_item.SerializeToString()
-    print("Sending item data to kafka:" ,item_bytes)
-    await producer.send_and_wait(settings.KAFKA_INVENTORY_TOPIC, item_bytes)
-    new_item = create_inventory_item(item, session)
-    return new_item
+@app.post("/auth/login")
+def login(token:LoginForAccessTokenDep):
+    return token
+
+@app.get("/manage-inventory/all", response_model=list[InventoryItem],dependencies=[Depends(admin_required)])
+def all_inventory_items(session: Annotated[Session, Depends(get_session)]):
+    """ Get all inventory items from the database"""
+    return get_all_inventory_items(session)
 
 
-""" Endpoint to get all inventory items """
-@app.get("/get-all-inventory/", response_model=list[InventoryItem])
-def call_all_inventory_items(session: Annotated[Session, Depends(get_session)]):
-    return get_all_inventory_item(session)
-
-
-""" Endpoint to get a single inventory item by ID """
-@app.get("/get-inventory/{item_id}", response_model=InventoryItem)
-def get_single_inventory_item(item_id: int, session: Annotated[Session, Depends(get_session)]):
+@app.get("/manage-inventory/{item_id}", response_model=InventoryItem,dependencies=[Depends(admin_required)])
+def single_inventory_item(item_id: int, session: Annotated[Session, Depends(get_session)]):
+    """ Get a single inventory item by ID"""
     try:
-        return get_inventory_item(item_id=item_id, session=session)
+        return get_inventory_item_by_id(inventory_item_id=item_id, session=session)
     except HTTPException as e:
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-""" Endpoint to update an inventory item by ID """
-@app.put("/update-inventory/{item_id}", response_model=InventoryItem)
-async def update_single_inventory_item(item_id: int, item_data: InventoryItem, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
-    # try:
-    #     return update_inventory_item(item_id=item_id, item_data=item_data, session=session)
-    # except HTTPException as e:
-    #     raise e
-    # except Exception as e:
-    #     raise HTTPException(status_code=500, detail=str(e))
-    proto_item = inventory_pb2.InventoryItem(
-        id=item_data.id,
-        name=item_data.name,
-        description=item_data.description,
-        price=item_data.price,
-        quantity=item_data.quantity,
-    )
-    item_bytes = proto_item.SerializeToString()
-    print("Sending update item data to kafka:", item_bytes)
-    await producer.send_and_wait(settings.KAFKA_INVENTORY_TOPIC, item_bytes)
-    update_item = update_inventory_item(item_id=item_id, item_data=item_data, session=session)
-    return update_item
 
-""" Endpoint to delete an inventory item by ID """
-@app.delete("/delete-inventory/{item_id}", response_model=dict)
+@app.delete("/manage-inventory/{item_id}", response_model=dict,dependencies=[Depends(admin_required)])
 def delete_single_inventory_item(item_id: int, session: Annotated[Session, Depends(get_session)]):
+    """ Delete a single inventory item by ID"""
     try:
-        return delete_inventory_item(item_id=item_id, session=session)
+        return delete_inventory_item_by_id(inventory_item_id=item_id, session=session)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.patch("/manage-inventory/{product_id}", response_model=InventoryItemUpdate,dependencies=[Depends(admin_required)])
+def update_single_inventory_item(product_id: int, item: InventoryItemUpdate, session: Annotated[Session, Depends(get_session)]):
+    """ Update a single inventory item by ID"""
+    try:
+        return update_inventory_by_id(product_id=product_id, update_product_inventory=item, session=session)
     except HTTPException as e:
         raise e
     except Exception as e:

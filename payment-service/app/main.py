@@ -1,129 +1,123 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
-from requests import session
-from sqlmodel import SQLModel, Session
-from app.crud.payment_crud import add_payment, update_payment_status
-from app.payment_db import engine
+from sqlmodel import Field, Session, SQLModel, select, Sequence
+from aiokafka import AIOKafkaConsumer,AIOKafkaProducer
+from fastapi import FastAPI, Depends,HTTPException
+from typing import Union, Optional, Annotated
 from contextlib import asynccontextmanager
-from app.models.payment_model import PaymentService
+from typing import AsyncGenerator
+import asyncio
 import stripe
-import logging
-import httpx
-from app.payment_producer import get_session
+import json
 
-logger = logging.getLogger(__name__)
+from app import settings
+from typing import Any,Annotated
+from app.payment_db import engine
+from app.settings import STRIPE_API_KEY
+from app.payment_producer import get_kafka_producer,get_session
+from app.models.payment_model import Payment,PaymentCreate,PaymentUpdate
+from app.auth import get_current_user,get_login_for_access_token,admin_required
+from app.crud.payment_crud import create_payment,get_payment,payment_status_update,get_payment_intent_status
+ 
+stripe.api_key = STRIPE_API_KEY
 
-# Set your Stripe secret key (test mode)
-stripe.api_key = 'YOUR_STRIPE_SECRET_KEY'
+GetCurrentUserDep = Annotated[ Any, Depends(get_current_user)]
+LoginForAccessTokenDep = Annotated[dict, Depends(get_login_for_access_token)]
 
-MY_DOMAIN = "http://localhost:8008"
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
+def create_db_and_tables()->None:
+    SQLModel.metadata.create_all(engine)
 
-def create_db_and_tables() -> None:
-   SQLModel.metadata.create_all(engine)
 
-@asynccontextmanager 
-async def lifespan(app: FastAPI): 
-   create_db_and_tables() 
-   yield 
+@asynccontextmanager
+async def lifespan(app: FastAPI)-> AsyncGenerator[None, None]:
+    print("Creating tables..")
+    create_db_and_tables()
+    yield
 
-app = FastAPI( 
-   lifespan=lifespan,
-   title="Payment Service with Stripe Integration",
-   description="Online Mart API",
-   version="0.0.2",
-)
 
-@app.post("/auth")
-async def login(username: str, email: str, password: str):
-   """
-   Authenticate user and return an access token.
-   """
-   user_service_url = "http://user-service:8006/login"  # Use HTTPS here if available
-   
-   async with httpx.AsyncClient() as client:
-       response = await client.post(user_service_url, json={"username": username, "email": email, "password": password})
-   
-   if response.status_code == 200:
-       return {"message": "Login successful", "user_id": response.json()["user_id"]}
-   else:
-       raise HTTPException(status_code=response.status_code, detail="Authentication failed")
+app = FastAPI(
+    lifespan=lifespan, 
+    title="Welcome To Payment Service",
+    description="Online Mart API",
+    version="0.0.1",
 
-@app.post("/create-stripe-payment/")
-async def create_stripe_payment(
-   payment: PaymentService,
-   auth: str = Depends(oauth2_scheme),
-   session: Session = Depends(get_session),
-):
-   """
-   Creates a payment record and generates a Stripe checkout URL.
-   """
-   # Optionally verify the token here if needed
-   
-   # Proceed with payment processing 
-   try:
-       new_payment = add_payment(payment , session)
+    # servers=[
+    #     {
+    #         "url": "http://127.0.0.1:8000", # ADD NGROK URL Here Before Creating GPT Action
+    #         "description": "Development Server"
+    #     }
+    #     ]
+        )
+        
+@app.get("/")
+def read_root():
 
-       # Create Stripe Checkout Session 
-       stripe_session=stripe.checkout.Session.create( 
-           payment_method_types=['card'], 
-           line_items=[{ 'price_data':{ 'currency':'usd', 'product_data':{'name':'Order Payment'}, 'unit_amount':int(payment.amount *100), }, 'quantity':1 , }, ], 
-           mode='payment', 
-           success_url=f"{MY_DOMAIN}/stripe-callback/payment-success?session_id={{CHECKOUT_SESSION_ID}}", 
-           cancel_url=f"{MY_DOMAIN}/payment-cancel", 
-           client_reference_id=str(payment.order_id)  # Set client_reference_id to order_id 
-       )
+    return {"Payment": "Services"}
 
-       return { 
-           "payment_details":{ 
-               "id":new_payment.id , 
-               "order_id":new_payment.order_id , 
-               "amount":new_payment.amount , 
-               "status":new_payment.status , 
-               "payment_gateway":new_payment.payment_gateway 
-           }, 
-           "checkout_url":stripe_session.url  # Return the Stripe checkout URL 
-       }
 
-   except Exception as e:
-       raise HTTPException(status_code=400 , detail=str(e))
+@app.post("/auth/login")
+def login(token:LoginForAccessTokenDep):
+    return token
+
+@app.post("/payments/")
+async def create_payment_endpoint(payment: PaymentCreate, session: Session = Depends(get_session), current_user: Any = Depends(get_current_user)):
+    pay_data,checkout_url = create_payment(session=session, payment_data=payment, user_id=current_user['id'],username=current_user['username'],email=current_user['email'])
+    if checkout_url:
+        return {"Payment":pay_data,"checkout_url": checkout_url}
+    return {"payment": pay_data}
+
+@app.get("/payments/{payment_id}", response_model=Payment,dependencies=[Depends(get_current_user)])
+def read_payment(payment_id: int, session: Session = Depends(get_session), current_user: Any = Depends(get_current_user)):
+    return get_payment(session, payment_id, current_user["id"])
+
+@app.patch("/payments/{payment_id}", response_model=Payment,dependencies=[Depends(admin_required)])
+def update_payment(payment_id: int, payment_update: PaymentUpdate, session: Session = Depends(get_session),current_user: Any = Depends(get_current_user)):
+    payment = get_payment(session, payment_id, current_user["id"])
+    updated_payment = payment_status_update(session, payment_id, payment_update.status)
+    return updated_payment
+
 
 @app.get("/stripe-callback/payment-success/")
-async def payment_success(session_id:str):
-   """
-   This endpoint is called after successful payment.
-   """
-   try:
-       # Retrieve Stripe session details 
-       stripe_session=stripe.checkout.Session.retrieve(session_id) 
+async def payment_success(session_id: str, session: Annotated[Session, Depends(get_session)], producer: Annotated[AIOKafkaProducer, Depends(get_kafka_producer)]):
+    try:
+        payment_status, order_id = get_payment_intent_status(session_id)
+        if payment_status == "succeeded":
+            payment = payment_status_update(session, order_id=order_id, status="completed")
+            if payment:
+                event = {
+                    "order_id": payment.order_id,
+                    "status": "Paid",
+                    "user_id": payment.user_id,
+                    "amount": payment.amount,
+                }
+                await producer.send_and_wait("payment_succeeded", json.dumps(event).encode('utf-8'))
+                notification_message = {
+                    "user_id": payment.user_id,
+                    "username": payment.username,
+                    "email": payment.email,
+                    "title": "Payment Sent",
+                    "message": f"Amount {payment.amount}$ has been sent successfully by {payment.username}.",
+                    "recipient": payment.email,
+                    "status": "succeeded"
+                }
+                notification_json = json.dumps(notification_message).encode("utf-8")
+                await producer.send_and_wait("notification-topic", notification_json)
 
-       # Extract and validate the order ID 
-       order_id_str=stripe_session.client_reference_id 
-       if order_id_str is None:
-           logger.error(f"Client reference ID is None for session ID: {session_id}") 
-           raise HTTPException(status_code=400 , detail="Invalid session: Client reference ID is missing.")
+            return {"message": "Payment succeeded", "order_id": payment.order_id}
+        else:
+            payment = payment_status_update(session, order_id=order_id, status="failed")
+            return {"message": "Payment not completed", "payment_status": payment_status, "order_id": payment.order_id}
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{e}")
 
-       try:
-           order_id=int(order_id_str)  # Convert order_id to integer 
-       except ValueError:
-           logger.error(f"Failed to convert order ID to integer: {order_id_str}") 
-           raise HTTPException(status_code=400 , detail="Invalid order ID format.")
-
-       logger.info(f"Extracted order ID: {order_id}")
-
-       payment_status=stripe_session.payment_status
-
-       # Update payment status in the database 
-       if payment_status=="succeeded":
-           payment=update_payment_status(session , order_id=order_id , status="completed") 
-           logger.info(f"Updated payment status for order ID {order_id}: {payment}") 
-
-           return {"message":"Payment succeeded" ,"order_id":payment.order_id}
-       else:
-           payment=update_payment_status(session , order_id=order_id , status="failed") 
-           return {"message":"Payment not completed" ,"payment_status":payment_status ,"order_id":payment.order_id}
-   
-   except Exception as e:
-       logger.error(f"Error processing payment: {e}") 
-       raise HTTPException(status_code=500 , detail=f"Error processing payment: {e}")
+@app.get("/stripe-callback/payment-fail/")
+async def payment_fail(session_id: str, session: Session = Depends(get_session)):
+    try:
+        payment_status, order_id = get_payment_intent_status(session_id)
+        payment = payment_status_update(session, order_id=order_id, status="failed")
+        return {"message": "Payment failed", "payment_status": payment_status, "order_id": payment.order_id}
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"{e}")

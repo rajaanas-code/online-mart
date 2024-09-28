@@ -1,22 +1,42 @@
-from aiokafka import AIOKafkaConsumer
-from app.crud.notification_crud import save_notification_to_db
+from sqlmodel import Field, Session, SQLModel, select, Sequence
+from app.crud.notification_crud import add_new_notification
+from aiokafka import AIOKafkaConsumer,AIOKafkaProducer
+from app.models.notification_model import Notification
+# from app.send_email import send_email_notification
+from fastapi import FastAPI, Depends,HTTPException
 from app.notification_producer import get_session
+from contextlib import asynccontextmanager
+from app.notification_db import engine
+from typing import AsyncGenerator
 import json
-from app import settings
 
-async def consume_notification_messages():
+async def consume_messages(topic, bootstrap_servers):
     consumer = AIOKafkaConsumer(
-        settings.KAFKA_NOTIFICATION_TOPIC,
-        bootstrap_servers=settings.BOOTSTRAP_SERVER,
-        group_id="notification-group",
-        auto_offset_reset='earliest'
+        topic,
+        bootstrap_servers=bootstrap_servers,
+        group_id="notification-consumer-group",
+        auto_offset_reset="earliest",
     )
     await consumer.start()
     try:
         async for message in consumer:
-            notification_data = json.loads(message.value.decode('utf-8'))
-            print(f"Received message: {notification_data}")
+            print(f"Received message on topic {message.topic}")
+
+            notification_data = json.loads(message.value.decode())
+            print(f"Notification Data: {notification_data}")
+
             with next(get_session()) as session:
-                save_notification_to_db(notification_data=notification_data, session=session)
+                print("Saving data to database")
+                db_insert_notification = add_new_notification(
+                    notification_data=Notification(**notification_data), session=session)
+                print("DB_INSERT_NOTIFICATION", db_insert_notification)
+            #Send email notification
+            # if 'recipient' in notification_data:
+            #         send_email_notification(
+            #             email_to=notification_data['recipient'],
+            #             subject=notification_data['title'],
+            #             email_content_for_send=notification_data['message']
+            #         )
     finally:
+        
         await consumer.stop()

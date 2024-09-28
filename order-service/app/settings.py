@@ -1,22 +1,11 @@
-from starlette.config import Config
 from starlette.datastructures import Secret
+from starlette.config import Config
 
-try:
-    config = Config(".env")
-except FileNotFoundError:
-    config = Config()
+config = Config(".env")
 
+BOOTSTRAP_SERVER = config("BOOTSTRAP_SERVER", cast=str)
 DATABASE_URL = config("DATABASE_URL", cast=Secret)
-BOOTSTRAP_SERVERS = config("BOOTSTRAP_SERVERS", cast=str)
 
-KAFKA_PRODUCT_TOPIC = config("KAFKA_PRODUCT_TOPIC", cast=str, default="product-events")
 KAFKA_ORDER_TOPIC = config("KAFKA_ORDER_TOPIC", cast=str, default="order-events")
-KAFKA_USER_TOPIC = config("KAFKA_USER_TOPIC", cast=str, default="user-events")
-KAFKA_PAYMENT_TOPIC = config("KAFKA_PAYMENT_TOPIC", cast=str, default="payment-events")
 KAFKA_NOTIFICATION_TOPIC = config("KAFKA_NOTIFICATION_TOPIC", cast=str, default="notification-events")
-
-MAILJET_API_KEY = config("MAILJET_API_KEY", cast=str)
-MAILJET_SECRET_KEY = config("MAILJET_SECRET_KEY", cast=Secret)
-
-
-# KAFKA_CONSUMER_GROUP_ID_FOR_ORDER = config("KAFKA_CONSUMER_GROUP_ID_FOR_ORDER", cast=str)
+KAFKA_CONSUMER_GROUP_ID_FOR_PRODUCT = config("KAFKA_CONSUMER_GROUP_ID_FOR_PRODUCT", cast=str, default="product-events")
