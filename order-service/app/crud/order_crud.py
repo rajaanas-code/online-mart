@@ -1,9 +1,6 @@
-from app.consumer.update_consumer import consume_payment_response_message
-from app.models.order_model import Order,OrderUpdate
-from aiokafka import AIOKafkaProducer
+from app.models.order_model import Order
 from sqlmodel import Session, select
 from fastapi import HTTPException
-from app.order_db import engine
 import requests
 
 def send_order_to_kafka(session: Session, order: Order, product_price: float):

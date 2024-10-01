@@ -1,5 +1,4 @@
 from app.stock_update import update_stock_in_inventory
-from app.inventory_producer import get_session
 from aiokafka import AIOKafkaConsumer
 import json
 

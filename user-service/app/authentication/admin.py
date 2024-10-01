@@ -2,7 +2,6 @@ from app.authentication.auth import hash_password
 from app.models.user_model import User, Role
 from sqlmodel import Session,select
 from app.user_db import engine
-from app import settings
 import os
 
 def create_initial_admin():

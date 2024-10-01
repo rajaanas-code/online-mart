@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel,Field
+from sqlmodel import SQLModel, Field
 from typing import Optional
 
 class Notification(SQLModel, table=True):

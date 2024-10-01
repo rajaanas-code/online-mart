@@ -1,21 +1,20 @@
-from sqlmodel import Field, Session, SQLModel, select, Sequence
-from fastapi import FastAPI, Depends,HTTPException 
-from typing import Union, Optional, Annotated,Any
+from fastapi import FastAPI, Depends, HTTPException 
+from sqlmodel import Session, SQLModel, select
 from contextlib import asynccontextmanager
 from aiokafka import AIOKafkaProducer
 from typing import AsyncGenerator
-import requests
+from typing import Annotated, Any
 import asyncio
 import json
 
 from app import settings
 from app.order_db import engine
-from app.order_producer import get_kafka_producer,get_session
+from app.order_producer import get_kafka_producer, get_session
+from app.models.order_model import Order, OrderCreate, OrderRead
 from app.consumer.check_consumer import consume_order_response_messages
 from app.consumer.update_consumer import consume_payment_response_message
-from app.models.order_model import Order,OrderUpdate,OrderBase,OrderCreate,OrderRead
-from app.auth import get_current_user,get_login_for_access_token,admin_required,oauth2_scheme
-from app.crud.order_crud import place_order,get_all_orders,get_order,delete_order,send_order_to_kafka,get_product_price,update_order_status
+from app.auth import get_current_user, get_login_for_access_token, admin_required
+from app.crud.order_crud import get_all_orders, delete_order, send_order_to_kafka, get_product_price, update_order_status
 
 GetCurrentUserDep = Annotated[ Any, Depends(get_current_user)]
 LoginForAccessTokenDep = Annotated[dict, Depends(get_login_for_access_token)]

@@ -1,15 +1,14 @@
-from app.models.product_model import Product,ProductUpdate
+from app.models.product_model import Product
 from app.crud.product_crud import add_new_product
 from app.product_producer import get_session
 from aiokafka import AIOKafkaConsumer
-from app import settings
 import json
 
 async def consume_messages(topic, bootstrap_servers):
     consumer = AIOKafkaConsumer(
         topic,
         bootstrap_servers=bootstrap_servers,
-        group_id=settings.KAFKA_CONSUMER_GROUP_ID_FOR_PRODUCT,
+        group_id="product-events",
         auto_offset_reset='earliest'
     )
 

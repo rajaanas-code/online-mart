@@ -1,13 +1,8 @@
-from sqlmodel import Field, Session, SQLModel, select, Sequence
 from app.crud.notification_crud import add_new_notification
-from aiokafka import AIOKafkaConsumer,AIOKafkaProducer
 from app.models.notification_model import Notification
 # from app.send_email import send_email_notification
-from fastapi import FastAPI, Depends,HTTPException
 from app.notification_producer import get_session
-from contextlib import asynccontextmanager
-from app.notification_db import engine
-from typing import AsyncGenerator
+from aiokafka import AIOKafkaConsumer
 import json
 
 async def consume_messages(topic, bootstrap_servers):

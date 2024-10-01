@@ -1,5 +1,5 @@
-from sqlmodel import create_engine
 from app.settings import DATABASE_URL
+from sqlmodel import create_engine
 
 connection_string = str(DATABASE_URL).replace(
     "postgresql", "postgresql+psycopg"

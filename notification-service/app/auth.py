@@ -1,7 +1,7 @@
-from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
-from fastapi import Depends, HTTPException, status
-from typing import Annotated,Any,Dict
-from requests import get,post
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException
+from typing import Annotated, Any, Dict
+from requests import get, post
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 

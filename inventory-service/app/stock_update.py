@@ -1,7 +1,6 @@
 from app.models.inventory_model import InventoryItem
 from sqlmodel import Session, select
 from app.inventory_db import engine
-from fastapi import HTTPException
 
 def update_stock_in_inventory(order_data):
     with Session(engine) as session:

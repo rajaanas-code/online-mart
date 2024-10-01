@@ -1,4 +1,4 @@
-from app.models.user_model import User,TokenData,Role
+from app.models.user_model import User, TokenData, Role
 from fastapi import Depends, HTTPException, status
 from datetime import datetime, timezone, timedelta
 from fastapi.security import OAuth2PasswordBearer

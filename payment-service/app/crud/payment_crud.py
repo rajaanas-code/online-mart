@@ -1,4 +1,4 @@
-from app.models.payment_model import Payment, PaymentCreate, PaymentUpdate
+from app.models.payment_model import Payment, PaymentCreate
 from app.settings import STRIPE_API_KEY
 from sqlmodel import Session, select
 from fastapi import HTTPException
@@ -22,7 +22,7 @@ def create_payment(session: Session, payment_data: PaymentCreate, user_id: int,u
             }],
             mode='payment',
            success_url="http://localhost:8001/stripe-callback/payment-success/?session_id={CHECKOUT_SESSION_ID}",
-           cancel_url="http://localhost:8002/stripe-callback/payment-fail/?session_id={CHECKOUT_SESSION_ID}",
+           cancel_url="http://localhost:8001/stripe-callback/payment-fail/?session_id={CHECKOUT_SESSION_ID}",
             metadata={'order_id': payment_data.order_id, 'user_id': user_id}
         )
         payment = Payment(

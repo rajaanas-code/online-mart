@@ -1,5 +1,4 @@
-from app.crud.order_crud import place_order,get_product_price
-from app.order_producer import get_kafka_producer
+from app.crud.order_crud import place_order
 from app.order_producer import get_session
 from app.models.order_model import Order
 from aiokafka import AIOKafkaConsumer

@@ -1,4 +1,4 @@
-from app.models.inventory_model import InventoryItem,InventoryItemUpdate
+from app.models.inventory_model import InventoryItem, InventoryItemUpdate
 from sqlmodel import Session, select
 from fastapi import HTTPException
 

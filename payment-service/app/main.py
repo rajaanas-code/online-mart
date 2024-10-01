@@ -1,21 +1,19 @@
-from sqlmodel import Field, Session, SQLModel, select, Sequence
-from aiokafka import AIOKafkaConsumer,AIOKafkaProducer
-from fastapi import FastAPI, Depends,HTTPException
-from typing import Union, Optional, Annotated
+from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
+from sqlmodel import Session, SQLModel
+from aiokafka import AIOKafkaProducer
 from typing import AsyncGenerator
-import asyncio
+from typing import Annotated
 import stripe
 import json
 
-from app import settings
 from typing import Any,Annotated
 from app.payment_db import engine
 from app.settings import STRIPE_API_KEY
-from app.payment_producer import get_kafka_producer,get_session
-from app.models.payment_model import Payment,PaymentCreate,PaymentUpdate
-from app.auth import get_current_user,get_login_for_access_token,admin_required
-from app.crud.payment_crud import create_payment,get_payment,payment_status_update,get_payment_intent_status
+from app.payment_producer import get_kafka_producer, get_session
+from app.models.payment_model import Payment, PaymentCreate, PaymentUpdate
+from app.auth import get_current_user, get_login_for_access_token, admin_required
+from app.crud.payment_crud import create_payment, get_payment, payment_status_update, get_payment_intent_status
  
 stripe.api_key = STRIPE_API_KEY
 

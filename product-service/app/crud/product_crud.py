@@ -1,6 +1,6 @@
 from app.models.product_model import ProductUpdate
 from app.models.product_model import Product
-from sqlmodel import Session , select
+from sqlmodel import Session, select
 from fastapi import HTTPException
 
 def add_new_product(product_data : Product ,session = Session):

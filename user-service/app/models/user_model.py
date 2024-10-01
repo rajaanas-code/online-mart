@@ -1,5 +1,5 @@
-from typing import Optional,Annotated
-from sqlmodel import SQLModel,Field
+from typing import Optional, Annotated
+from sqlmodel import SQLModel, Field
 from pydantic import BaseModel
 from fastapi import Form
 from enum import Enum

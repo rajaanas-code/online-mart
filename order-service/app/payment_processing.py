@@ -1,7 +1,6 @@
 from app.models.order_model import Order
 from aiokafka import AIOKafkaProducer
 from sqlmodel import Session, select
-from fastapi import HTTPException
 from app.order_db import engine
 import json
 

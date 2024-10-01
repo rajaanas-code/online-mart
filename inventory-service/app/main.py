@@ -1,21 +1,19 @@
-from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
 from sqlmodel import Session, SQLModel
 from typing import AsyncGenerator
 from typing import Annotated
 import asyncio
-import json
 
 from app import settings
 from app.inventory_db import engine
+from app.inventory_producer import get_session
+from app.auth import admin_required, LoginForAccessTokenDep
 from app.consumer.add_inventory_consumer import consume_messages
-from app.inventory_producer import get_session, get_kafka_producer
 from app.consumer.check_stock_consumer import consume_order_messages
-from app.models.inventory_model import InventoryItem,InventoryItemUpdate
+from app.models.inventory_model import InventoryItem, InventoryItemUpdate
 from app.consumer.update_stock_consumer import consume_order_paid_messages
-from app.auth import get_current_user,admin_required,LoginForAccessTokenDep
-from app.crud.inventory_crud import delete_inventory_item_by_id, get_all_inventory_items, get_inventory_item_by_id,update_inventory_by_id
+from app.crud.inventory_crud import delete_inventory_item_by_id, get_all_inventory_items, get_inventory_item_by_id, update_inventory_by_id
 
 def create_db_and_tables() -> None:
     SQLModel.metadata.create_all(engine)

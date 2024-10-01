@@ -1,10 +1,8 @@
-from app.inventory_producer import get_kafka_producer
 from app.models.inventory_model import InventoryItem
 from app.inventory_producer import get_session
 from aiokafka import AIOKafkaConsumer
 from aiokafka import AIOKafkaProducer
-from sqlmodel import Session, select
-from typing import Annotated
+from sqlmodel import select
 import json
 
 async def consume_order_messages(topic, bootstrap_servers):

@@ -1,6 +1,5 @@
 from sqlmodel import Field, SQLModel
 from datetime import datetime 
-from typing import Optional
 
 class OrderBase(SQLModel):
     product_id: int

@@ -1,21 +1,18 @@
-from sqlmodel import Field, Session, SQLModel, select, Sequence
-from aiokafka import AIOKafkaConsumer,AIOKafkaProducer
-from fastapi import FastAPI, Depends,HTTPException
-from typing import Union, Optional, Annotated
+from fastapi import FastAPI, Depends, HTTPException
+from sqlmodel import Session, SQLModel, select
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+from typing import Annotated
 import asyncio
-import json
 
 
-from app import settings
 from app.notification_db import engine
+from app.notification_producer import get_session
 # from app.send_email import send_email_notification
 from app.notification_consumer import consume_messages
-from app.notification_producer import get_kafka_producer,get_session
-from app.models.notification_model import Notification,NotificationUpdate
-from app.auth import get_current_user,admin_required,LoginForAccessTokenDep
-from app.crud.notification_crud import add_new_notification,delete_notification_by_id,get_notification_by_id,get_all_notifications,update_notification_by_id
+from app.models.notification_model import Notification, NotificationUpdate
+from app.auth import get_current_user, admin_required, LoginForAccessTokenDep
+from app.crud.notification_crud import delete_notification_by_id, get_notification_by_id, get_all_notifications, update_notification_by_id
 
 def create_db_and_tables()->None:
     SQLModel.metadata.create_all(engine)

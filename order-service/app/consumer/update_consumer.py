@@ -1,7 +1,4 @@
 from app.payment_processing import process_payment_event
-from app.order_producer import get_kafka_producer
-from app.order_producer import get_session
-from app.models.order_model import Order
 from aiokafka import AIOKafkaConsumer
 import asyncio
 import json

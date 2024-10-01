@@ -1,20 +1,19 @@
-from sqlmodel import Field, Session, SQLModel, select, Sequence
-from aiokafka import AIOKafkaConsumer,AIOKafkaProducer
-from fastapi import FastAPI, Depends,HTTPException
-from typing import Union, Optional, Annotated
+from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
+from sqlmodel import Session, SQLModel
+from aiokafka import AIOKafkaProducer
 from typing import AsyncGenerator
+from typing import Annotated
 import asyncio
 import json
 
 from app import settings
 from app.product_db import engine
-from sqlmodel import create_engine
 from app.product_consumer import consume_messages
-from app.models.product_model import Product,ProductUpdate
-from app.product_producer import get_kafka_producer,get_session
-from app.auth import get_current_user,admin_required,LoginForAccessTokenDep,admin_user
-from app.crud.product_crud import get_all_products,delete_product_by_id,update_product_by_id,get_product_by_id
+from app.models.product_model import Product, ProductUpdate
+from app.product_producer import get_kafka_producer, get_session
+from app.auth import get_current_user, admin_required, LoginForAccessTokenDep, admin_user
+from app.crud.product_crud import get_all_products, delete_product_by_id, update_product_by_id, get_product_by_id
 
 def create_db_and_tables()->None:
     SQLModel.metadata.create_all(engine)
