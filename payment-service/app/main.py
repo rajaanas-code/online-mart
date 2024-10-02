@@ -49,7 +49,7 @@ app = FastAPI(
 @app.get("/")
 def read_root():
 
-    return {"Payment": "Services"}
+    return {"message": "This is Payment Service"}
 
 
 @app.post("/auth/login")
