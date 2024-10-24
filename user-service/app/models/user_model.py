@@ -21,19 +21,9 @@ class UserUpdate(SQLModel):
     password: Optional[str] = None
 
 class Register_User (BaseModel):
-            username: Annotated[
-            str,
-            Form(),
-        ]
-            email: Annotated[
-            str,
-            Form(),
-        ]
-            password: Annotated[
-            str,
-            Form(),
-        ]
-
+    username: Annotated[str,Form(),]
+    email: Annotated[str,Form()]
+    password: Annotated[str,Form()]
 
 class Token (BaseModel):
         access_token:str

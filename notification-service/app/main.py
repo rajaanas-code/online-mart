@@ -5,13 +5,12 @@ from typing import AsyncGenerator
 from typing import Annotated
 import asyncio
 
-
 from app.notification_db import engine
 from app.notification_producer import get_session
 # from app.send_email import send_email_notification
 from app.notification_consumer import consume_messages
 from app.models.notification_model import Notification, NotificationUpdate
-from app.auth import get_current_user, admin_required, LoginForAccessTokenDep
+from app.authentication.auth import get_current_user, admin_required, LoginForAccessTokenDep
 from app.crud.notification_crud import delete_notification_by_id, get_notification_by_id, get_all_notifications, update_notification_by_id
 
 def create_db_and_tables()->None:

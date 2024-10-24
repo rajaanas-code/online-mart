@@ -1,6 +1,5 @@
 from app.authentication.auth import hash_password
-from app.models.user_model import UserUpdate
-from app.models.user_model import User
+from app.models.user_model import UserUpdate, User
 from sqlmodel import Session, select
 from fastapi import HTTPException
 

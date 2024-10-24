@@ -1,6 +1,6 @@
-from app.models.product_model import Product
 from app.crud.product_crud import add_new_product
 from app.product_producer import get_session
+from app.models.product_model import Product
 from aiokafka import AIOKafkaConsumer
 import json
 

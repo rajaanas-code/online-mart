@@ -2,9 +2,9 @@ from app.models.user_model import User, TokenData, Role
 from fastapi import Depends, HTTPException, status
 from datetime import datetime, timezone, timedelta
 from fastapi.security import OAuth2PasswordBearer
-from app.user_producer import get_session
 from passlib.context import CryptContext
 from sqlmodel import Session, select
+from app.deps import get_session
 from jose import jwt, JWTError
 from typing import Annotated
 

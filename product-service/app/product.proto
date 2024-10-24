@@ -7,3 +7,17 @@ message Product {
     float price  = 4;
     int32 quantity = 5;
 }
+
+message ProductCreate {
+    string name = 1;
+    string description = 2;
+    float price = 3;
+    int32 quantity = 4; 
+}
+
+message ProductUpdate {
+    string name = 1;
+    string description = 2;
+    float price = 3;
+    int32 quantity = 4; 
+}

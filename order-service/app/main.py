@@ -13,7 +13,7 @@ from app.order_producer import get_kafka_producer, get_session
 from app.models.order_model import Order, OrderCreate, OrderRead
 from app.consumer.check_consumer import consume_order_response_messages
 from app.consumer.update_consumer import consume_payment_response_message
-from app.auth import get_current_user, get_login_for_access_token, admin_required
+from app.authentication.auth import get_current_user, get_login_for_access_token, admin_required
 from app.crud.order_crud import get_all_orders, delete_order, send_order_to_kafka, get_product_price, update_order_status
 
 GetCurrentUserDep = Annotated[ Any, Depends(get_current_user)]

@@ -9,7 +9,6 @@ async def consume_order_paid_messages(topic, bootstrap_servers):
         group_id="update-stock-consumer-group",
         auto_offset_reset="earliest",
     )
-
     await consumer.start()
     try:
         async for msg in consumer:

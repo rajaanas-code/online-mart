@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message Notification {
+    int32 id = 1;
+    int32 user_id = 2;
+    string title = 3;
+    string message = 4;
+    string recipient = 5;
+    string status = 6;
+}
+
+message NotificationUpdate {
+    int32 user_id = 1;
+    string title = 2;
+    string message = 3;
+    string recipient = 4;
+    string status = 5;
+}

@@ -9,9 +9,9 @@ import json
 
 from app import settings
 from app.user_db import engine
+from app.deps import get_kafka_producer, get_session
 from fastapi.security import OAuth2PasswordRequestForm
 from app.authentication.admin import create_initial_admin
-from app.user_producer import get_kafka_producer, get_session
 from app.models.user_model import User, UserUpdate, Register_User, Token, Role
 from app.crud.user_crud import get_user_by_id,get_all_users, delete_user_by_id, update_user_by_id
 from app.authentication.auth import get_user_from_db, hash_password, authenticate_user, EXPIRY_TIME, create_access_token, current_user, admin_required

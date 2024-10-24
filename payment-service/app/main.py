@@ -10,9 +10,9 @@ import json
 from typing import Any,Annotated
 from app.payment_db import engine
 from app.settings import STRIPE_API_KEY
-from app.payment_producer import get_kafka_producer, get_session
+from app.deps import get_kafka_producer, get_session
 from app.models.payment_model import Payment, PaymentCreate, PaymentUpdate
-from app.auth import get_current_user, get_login_for_access_token, admin_required
+from app.authentication.auth import get_current_user, get_login_for_access_token, admin_required
 from app.crud.payment_crud import create_payment, get_payment, payment_status_update, get_payment_intent_status
  
 stripe.api_key = STRIPE_API_KEY
@@ -20,10 +20,8 @@ stripe.api_key = STRIPE_API_KEY
 GetCurrentUserDep = Annotated[ Any, Depends(get_current_user)]
 LoginForAccessTokenDep = Annotated[dict, Depends(get_login_for_access_token)]
 
-
 def create_db_and_tables()->None:
     SQLModel.metadata.create_all(engine)
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI)-> AsyncGenerator[None, None]:
@@ -31,26 +29,17 @@ async def lifespan(app: FastAPI)-> AsyncGenerator[None, None]:
     create_db_and_tables()
     yield
 
-
 app = FastAPI(
     lifespan=lifespan, 
     title="Welcome To Payment Service",
     description="Online Mart API",
     version="0.0.1",
-
-    # servers=[
-    #     {
-    #         "url": "http://127.0.0.1:8000", # ADD NGROK URL Here Before Creating GPT Action
-    #         "description": "Development Server"
-    #     }
-    #     ]
-        )
+)
         
 @app.get("/")
 def read_root():
 
     return {"message": "This is Payment Service"}
-
 
 @app.post("/auth/login")
 def login(token:LoginForAccessTokenDep):

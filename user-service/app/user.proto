@@ -1,8 +1,35 @@
 syntax = "proto3";
 
+enum Role {
+    USER = 0;
+    ADMIN = 1;
+}
+
 message user {
     int32 id = 1;
     string username = 2;
     string email = 3;
-    string password_hash = 5;
+    string password = 4;
+    Role role = 5;
+}
+
+message UserUpdate {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+}
+
+message RegisterUser {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+}
+
+message Token {
+    string access_token = 1;
+    string token_type = 2;
+}
+
+message TokenData {
+    string username = 1;
 }

@@ -1,5 +1,5 @@
 services:
-###################     Microservices    ###################
+###################    Microservices    ###################
   user-service:
     build:
       context: ./user-service
@@ -83,7 +83,7 @@ services:
       - POSTGRES_PASSWORD=user_12
       - POSTGRES_DB=userdatabase
     ports:
-      - '5495:5432'
+      - '5436:5432'
     volumes:
       - user_database:/var/lib/postgresql/data
 
@@ -96,7 +96,7 @@ services:
       - POSTGRES_PASSWORD=product_34
       - POSTGRES_DB=productdatabase
     ports:
-      - '5440:5432'
+      - '5437:5432'
     volumes:
       - product_database:/var/lib/postgresql/data
 
@@ -109,7 +109,7 @@ services:
     - POSTGRES_PASSWORD=payment_50
     - POSTGRES_DB=paymentdatabase
     ports:
-    - '5457:5432'
+    - '5438:5432'
     volumes:
     - payment_database:/var/lib/postgresql/data
   
@@ -122,7 +122,7 @@ services:
       - POSTGRES_PASSWORD=order_56
       - POSTGRES_DB=orderdatabase
     ports:
-      - '5463:5432'
+      - '5439:5432'
     volumes:
       - order_database:/var/lib/postgresql/data
 
@@ -135,7 +135,7 @@ services:
       - POSTGRES_PASSWORD=notification_56
       - POSTGRES_DB=notificationdatabase
     ports:
-      - '5478:5432'
+      - '5440:5432'
     volumes:
       - notification_database:/var/lib/postgresql/data
 
@@ -148,7 +148,7 @@ services:
       - POSTGRES_PASSWORD=inventory_78
       - POSTGRES_DB=inventorydatabase
     ports:
-      - '5488:5432'
+      - '5441:5432'
     volumes:
       - inventory_database:/var/lib/postgresql/data
   
@@ -188,7 +188,29 @@ services:
     depends_on:
       - broker
 
-################### Volumes & Network ##################
+################### Kong API Gateway ###################
+
+  # kong:
+  #   image: kong:3.0.0
+  #   container_name: kong
+  #   ports:
+  #     - "8000:8000"   # Proxy port
+  #     - "8001:8001"   # Admin port
+  #   environment:
+  #     KONG_DATABASE: "off"
+  #     KONG_PROXY_LISTEN: "0.0.0.0:8000"
+  #     KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+  #   depends_on:
+  #     - kong-migrations
+
+  # kong-migrations:
+  #   image: kong:3.0.0
+  #   container_name: kong-migrations
+  #   command: "kong migrations bootstrap"
+  #   depends_on:
+  #     - broker
+
+################### Volumes & Network ###################
 
 volumes:
   user_database:

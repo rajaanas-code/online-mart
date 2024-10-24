@@ -8,11 +8,11 @@ import asyncio
 from app import settings
 from app.inventory_db import engine
 from app.inventory_producer import get_session
-from app.auth import admin_required, LoginForAccessTokenDep
 from app.consumer.add_inventory_consumer import consume_messages
 from app.consumer.check_stock_consumer import consume_order_messages
 from app.models.inventory_model import InventoryItem, InventoryItemUpdate
 from app.consumer.update_stock_consumer import consume_order_paid_messages
+from app.authentication.auth import admin_required, LoginForAccessTokenDep
 from app.crud.inventory_crud import delete_inventory_item_by_id, get_all_inventory_items, get_inventory_item_by_id, update_inventory_by_id
 
 def create_db_and_tables() -> None:
@@ -22,7 +22,6 @@ def create_db_and_tables() -> None:
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("Creating table..")
     task = asyncio.create_task(consume_messages("product-events",settings.BOOTSTRAP_SERVER))
-    
     asyncio.create_task(consume_order_messages(
     "order_placed",
     settings.BOOTSTRAP_SERVER
